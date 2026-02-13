@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatCurrency, formatPercent, formatCompact } from "@/lib/utils";
+import { formatPercent, formatCompact } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 import Link from "next/link";
 import {
     Search,
@@ -57,6 +58,7 @@ export default function StocksPage() {
     const [selectedRec, setSelectedRec] = useState("All");
     const [sortBy, setSortBy] = useState("default");
     const [showFilters, setShowFilters] = useState(false);
+    const { formatPrice, currency } = useCurrency();
 
     // Role state
     const [isAdmin, setIsAdmin] = useState(false);
@@ -197,7 +199,7 @@ export default function StocksPage() {
                         </Link>
                     ) : (
                         <div className="text-xs font-medium text-[var(--text-secondary)] px-3 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
-                            Balance: <span className="text-[var(--text-primary)] font-bold">{formatCurrency(userBalance)}</span>
+                            Balance: <span className="text-[var(--text-primary)] font-bold">{formatPrice(userBalance)}</span>
                         </div>
                     )}
 
@@ -341,11 +343,11 @@ export default function StocksPage() {
 
                             <div className="space-y-1">
                                 <div className="text-2xl font-bold text-[var(--text-primary)]">
-                                    {formatCurrency(stock.price)}
+                                    {formatPrice(stock.price)}
                                 </div>
                                 <div className={`flex items-center gap-1 text-xs font-semibold ${stock.changePercent >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                                     {stock.changePercent >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                                    {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
+                                    {formatPrice(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
                                 </div>
                             </div>
                         </Link>
@@ -433,7 +435,7 @@ export default function StocksPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-extrabold text-[var(--text-primary)]">Buy {buyModalStock.symbol}</h3>
-                                        <p className="text-xs text-[var(--text-secondary)]">{buyModalStock.name} • {formatCurrency(buyModalStock.price)}/share</p>
+                                        <p className="text-xs text-[var(--text-secondary)]">{buyModalStock.name} • {formatPrice(buyModalStock.price)}/share</p>
                                     </div>
                                 </div>
 
@@ -442,14 +444,16 @@ export default function StocksPage() {
                                     {/* Balance Info */}
                                     <div className="flex justify-between items-center p-3 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
                                         <span className="text-xs font-medium text-[var(--text-secondary)]">Available Balance</span>
-                                        <span className="font-bold text-[var(--text-primary)]">{formatCurrency(userBalance)}</span>
+                                        <span className="font-bold text-[var(--text-primary)]">{formatPrice(userBalance)}</span>
                                     </div>
 
                                     {/* Amount Input */}
                                     <div>
-                                        <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">Amount to Invest ($)</label>
+                                        <label className="text-xs font-medium text-[var(--text-muted)] mb-1.5 block">Amount to Invest ({currency === 'INR' ? '₹' : '$'})</label>
                                         <div className="relative">
-                                            <DollarSign size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
+                                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
+                                                {currency === 'INR' ? '₹' : '$'}
+                                            </div>
                                             <input
                                                 type="number"
                                                 value={buyAmount}
@@ -472,7 +476,7 @@ export default function StocksPage() {
                                                     : "bg-[var(--bg-secondary)] border-transparent text-[var(--text-secondary)] hover:bg-[var(--border-color)]"
                                                     }`}
                                             >
-                                                ${amt}
+                                                {currency === 'INR' ? '₹' : '$'}{amt}
                                             </button>
                                         ))}
                                     </div>
@@ -486,11 +490,11 @@ export default function StocksPage() {
                                             </div>
                                             <div className="flex justify-between text-sm">
                                                 <span className="text-[var(--text-secondary)]">Price per Share</span>
-                                                <span className="font-bold text-[var(--text-primary)]">{formatCurrency(buyModalStock.price)}</span>
+                                                <span className="font-bold text-[var(--text-primary)]">{formatPrice(buyModalStock.price)}</span>
                                             </div>
                                             <div className="flex justify-between text-sm pt-2 border-t border-emerald-500/10">
                                                 <span className="text-[var(--text-secondary)]">Total Cost</span>
-                                                <span className="font-bold text-emerald-500">{formatCurrency(parseFloat(buyAmount))}</span>
+                                                <span className="font-bold text-emerald-500">{formatPrice(parseFloat(buyAmount))}</span>
                                             </div>
                                             {parseFloat(buyAmount) > userBalance && (
                                                 <p className="text-xs text-red-500 font-semibold mt-1">⚠️ Insufficient balance</p>

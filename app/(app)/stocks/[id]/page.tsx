@@ -2,7 +2,8 @@
 
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { formatCurrency, formatPercent, formatCompact } from "@/lib/utils";
+import { formatPercent, formatCompact } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 import { useToast } from "@/components/ToastProvider";
 import {
     XAxis,
@@ -63,6 +64,7 @@ interface Stock {
 export default function StockDetailPage() {
     const params = useParams();
     const { showToast } = useToast();
+    const { formatPrice, currency } = useCurrency();
 
     const [stock, setStock] = useState<Stock | null>(null);
     const [loading, setLoading] = useState(true);
@@ -158,7 +160,7 @@ export default function StockDetailPage() {
                 : `✅ ${s.symbol} remains a Strong Buy. Dollar-cost averaging into this position could maximize long-term returns.`;
             action = "buy";
         } else if (s.aiRecommendation === "Buy") {
-            suggestion = `📈 ${s.symbol} is rated Buy. Consider adding a moderate position and set a stop-loss near $${(s.price * 0.92).toFixed(2)} for risk management.`;
+            suggestion = `📈 ${s.symbol} is rated Buy. Consider adding a moderate position and set a stop-loss near ${(s.price * 0.92).toFixed(2)} for risk management.`;
             action = "buy";
         } else if (s.aiRecommendation === "Hold") {
             suggestion = `⏸️ ${s.symbol} is at Hold. If you already own shares, maintain your position. Wait for a clearer trend before adding more.`;
@@ -251,7 +253,7 @@ export default function StockDetailPage() {
             if (!res.ok) throw new Error(data.error || "Trade failed");
 
             const action = activeTab === "BUY" ? "Bought" : "Sold";
-            showToast(`${action} ${data.shares.toFixed(4)} shares of ${stock.symbol} for $${amount}!`, "success");
+            showToast(`${action} ${data.shares.toFixed(4)} shares of ${stock.symbol} for ${formatPrice(parseFloat(amount))}!`, "success");
             setAmount("");
 
             // Refresh data to update balance/shares/inventory
@@ -406,11 +408,11 @@ export default function StockDetailPage() {
 
                 <div className="flex flex-row md:flex-col justify-between items-center md:items-end gap-2 md:gap-0">
                     <div className="text-3xl font-extrabold text-[var(--text-primary)]">
-                        {formatCurrency(stock.price)}
+                        {formatPrice(stock.price)}
                     </div>
                     <div className={`flex items-center gap-1.5 font-bold text-sm px-2.5 py-1 rounded-full ${stock.changePercent >= 0 ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"}`}>
                         {stock.changePercent >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                        {formatCurrency(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
+                        {formatPrice(Math.abs(stock.change))} ({formatPercent(stock.changePercent)})
                     </div>
                 </div>
             </div>
@@ -476,7 +478,7 @@ export default function StockDetailPage() {
                                             color: "var(--text-primary)",
                                             boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                                         }}
-                                        formatter={(value: unknown) => [formatCurrency(Number(value)), "Price"]}
+                                        formatter={(value: unknown) => [formatPrice(Number(value)), "Price"]}
                                         labelStyle={{ color: "var(--text-secondary)", marginBottom: 4 }}
                                     />
                                     <Area
@@ -501,8 +503,8 @@ export default function StockDetailPage() {
                                 { label: "P/E Ratio", value: stock.pe.toFixed(1), desc: "Price/Earnings" },
                                 { label: "EPS", value: `$${stock.eps.toFixed(2)}`, desc: "Earnings/Share" },
                                 { label: "Dividend", value: stock.dividend > 0 ? `$${stock.dividend.toFixed(2)}` : "None", desc: "Yield" },
-                                { label: "52W High", value: formatCurrency(stock.high52w), desc: "Yearly high" },
-                                { label: "52W Low", value: formatCurrency(stock.low52w), desc: "Yearly low" },
+                                { label: "52W High", value: formatPrice(stock.high52w), desc: "Yearly high" },
+                                { label: "52W Low", value: formatPrice(stock.low52w), desc: "Yearly low" },
                                 { label: "Volume", value: formatCompact(stock.volume), desc: "Daily trade" },
                                 { label: "Sector", value: stock.sector, desc: "Industry" },
                             ].map((item) => (
@@ -577,7 +579,7 @@ export default function StockDetailPage() {
                         {/* Balance/Holding Info */}
                         <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-2 font-medium">
                             {activeTab === "BUY" ? (
-                                <span>Balance: <span className="text-[var(--text-primary)]">{formatCurrency(stock.userBalance || 0)}</span></span>
+                                <span>Balance: <span className="text-[var(--text-primary)]">{formatPrice(stock.userBalance || 0)}</span></span>
                             ) : (
                                 <span>Owned: <span className="text-[var(--text-primary)]">{(stock.userShares || 0).toFixed(4)} shares</span></span>
                             )}
@@ -585,7 +587,7 @@ export default function StockDetailPage() {
 
                         <div className="space-y-4">
                             <div className="relative">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] font-semibold text-lg">$</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] font-semibold text-lg">{currency === 'INR' ? '₹' : '$'}</span>
                                 <input
                                     type="number"
                                     placeholder="0.00"
@@ -605,7 +607,7 @@ export default function StockDetailPage() {
                                     {activeTab === "BUY" && (
                                         <div className="flex justify-between text-sm">
                                             <span className="text-[var(--text-secondary)]">Est. 1Y Return</span>
-                                            <span className="font-bold text-emerald-500">+{formatCurrency(simReturn1y)}</span>
+                                            <span className="font-bold text-emerald-500">+{formatPrice(simReturn1y)}</span>
                                         </div>
                                     )}
                                 </div>

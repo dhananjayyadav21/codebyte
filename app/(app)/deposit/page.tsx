@@ -1,21 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { formatCurrency } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 import { useToast } from "@/components/ToastProvider";
-import { ArrowLeft, Wallet, ShieldCheck, Zap, Lock, CreditCard, Smartphone, Banknote } from "lucide-react";
+import { ArrowLeft, Wallet, ShieldCheck, Zap, Lock, CreditCard, Smartphone, Banknote, Globe, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import Script from "next/script";
+
+declare global {
+    interface Window {
+        Razorpay: any;
+    }
+}
 
 export default function DepositPage() {
     const router = useRouter();
     const { showToast } = useToast();
+    const { currency, setCurrency } = useCurrency(); // Use global currency
     const [amount, setAmount] = useState("");
     const [loading, setLoading] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState("razorpay");
 
-    const quickAmounts = [100, 500, 1000, 5000];
+    // Quick amounts based on currency
+    const quickAmounts = currency === "INR"
+        ? [100, 500, 1000, 5000]
+        : [10, 50, 100, 500];
 
+    // Helper to generic format
+    const displayCurrency = (val: number, curr: string) => {
+        return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: curr,
+            minimumFractionDigits: 0,
+        }).format(val);
+    };
+
+    // Handle Payment via Razorpay
     const handleDeposit = async () => {
         if (!amount || parseFloat(amount) <= 0) {
             showToast("Please enter a valid amount", "error");
@@ -24,34 +44,118 @@ export default function DepositPage() {
 
         setLoading(true);
 
+        // Check if Razorpay SDK loaded
+        if (typeof window !== "undefined" && !window.Razorpay) {
+            console.warn("Razorpay SDK not loaded. Falling back to simulation.");
+            showToast("Razorpay SDK loading failed. Using simulation.", "info");
+            await simulateDeposit();
+            return;
+        }
+
         try {
-            // Simulate Razorpay Opening
+            // 1. Attempt to Create Order
+            let orderData;
+            try {
+                const orderRes = await fetch("/api/razorpay/order", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        amount: parseFloat(amount),
+                        currency: currency
+                    }),
+                });
+
+                orderData = await orderRes.json();
+
+                if (!orderRes.ok) throw new Error(orderData.error || "Order creation failed");
+            } catch (apiError: any) {
+                console.error("API Order Error:", apiError);
+                // Fallback to simulation for ANY API error (keys missing, network, etc)
+                const errorMsg = apiError.message || "Unknown error";
+                showToast(`Real Payment Failed: ${errorMsg}. Switching to Simulation...`, "info");
+                await simulateDeposit();
+                return;
+            }
+
+            // 2. Open Razorpay Checkout (Redirect support)
+            // Store amount for verification page
+            localStorage.setItem("pendingDepositAmount", amount);
+
+            const options = {
+                key: orderData.keyId,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "StakeWise Inc.",
+                description: `Wallet Deposit (${currency})`,
+                order_id: orderData.id,
+                callback_url: `${window.location.origin}/deposit/status`, // Enables Redirect
+                redirect: true,
+                theme: { color: "#3395ff" },
+                modal: {
+                    ondismiss: function () {
+                        setLoading(false);
+                    }
+                }
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.on('payment.failed', function (response: any) {
+                showToast(response.error.description || "Payment failed", "error");
+                setLoading(false);
+            });
+            rzp.open();
+
+        } catch (error: any) {
+            console.error("Razorpay Error:", error);
+            showToast("Error initializing payment. Using simulation.", "error");
+            await simulateDeposit();
+        } finally {
+            if (typeof window !== "undefined" && window.Razorpay) {
+                // if razorpay opened, loading is controlled by modal callbacks
+            } else {
+                setLoading(false);
+            }
+        }
+    };
+
+    // Fallback Simulation
+    const simulateDeposit = async () => {
+        try {
             await new Promise(resolve => setTimeout(resolve, 800));
-
-            // In a real app, this would open window.Razorpay
-            // Here we simulate the user completing payment
-            showToast("Redirecting to Razorpay Secure Gateway...", "info");
-
+            showToast(`Redirecting to Razorpay Secure Gateway [${currency}] (Simulated)...`, "info");
             await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Simulation needs to handle conversion logic too if we want it to match
+            // But for now, backend simulation just \"deposits\" whatever amount we send
+            // If we send USD, backend wallet expects Units.
+            // Let's manually convert for simulation locally if needed?
+            // Actually, backend wallet API is simple.
+            // Let's just send logic to wallet API.
+
+            let finalAmount = parseFloat(amount);
+            let description = "Simulated Deposit";
+            if (currency === "USD") {
+                finalAmount = finalAmount * 84;
+                description += " (Converted from USD)";
+            }
 
             const res = await fetch("/api/wallet", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    amount: parseFloat(amount),
+                    amount: finalAmount,
                     type: "DEPOSIT",
-                    provider: "razorpay", // purely informative for now
-                    paymentId: `pay_${Math.random().toString(36).substring(7)}`
+                    provider: "razorpay_simulated",
+                    paymentId: `pay_${Math.random().toString(36).substring(7)}`,
+                    description: description
                 })
             });
 
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Deposit failed");
-
-            showToast(`Successfully deposited ${formatCurrency(parseFloat(amount))}!`, "success");
+            showToast(`Successfully deposited ₹${finalAmount.toFixed(2)}!`, "success");
             router.push("/dashboard");
             router.refresh();
-
         } catch (error: any) {
             showToast(error.message, "error");
         } finally {
@@ -61,6 +165,7 @@ export default function DepositPage() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12 animate-fade-in">
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" />
             <Link href="/dashboard" className="inline-flex items-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-8 transition-colors">
                 <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
             </Link>
@@ -80,14 +185,15 @@ export default function DepositPage() {
                     </div>
 
                     <div className="space-y-6">
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800/30">
+                        {/* Currency Feature Highlight */}
+                        <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-100 dark:border-indigo-800/30">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-600/20">
-                                    <Zap size={24} />
+                                <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white shrink-0 shadow-lg shadow-indigo-600/20">
+                                    <Globe size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-[var(--text-primary)] text-lg">Instant Credit</h3>
-                                    <p className="text-sm text-[var(--text-secondary)]">Funds reflect in your wallet within seconds of payment.</p>
+                                    <h3 className="font-bold text-[var(--text-primary)] text-lg">Multi-Currency</h3>
+                                    <p className="text-sm text-[var(--text-secondary)]">Pay in INR (₹) or USD ($). Automatic conversion.</p>
                                 </div>
                             </div>
                         </div>
@@ -113,25 +219,47 @@ export default function DepositPage() {
                             Powered by Razorpay
                         </div>
 
-                        <div className="lg:hidden mb-6">
+                        {/* Currency Toggle */}
+                        <div className="flex justify-between items-center mb-6">
                             <h1 className="text-2xl font-bold text-[var(--text-primary)]">Add Funds</h1>
-                            <p className="text-[var(--text-secondary)]">Secure deposit via Razorpay</p>
+                            <div className="flex bg-[var(--bg-secondary)] p-1 rounded-xl border border-[var(--border-color)]">
+                                <button
+                                    onClick={() => { setCurrency("INR"); setAmount(""); }}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${currency === "INR" ? "bg-white dark:bg-zinc-700 shadow text-blue-600" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                                >
+                                    INR ₹
+                                </button>
+                                <button
+                                    onClick={() => { setCurrency("USD"); setAmount(""); }}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${currency === "USD" ? "bg-white dark:bg-zinc-700 shadow text-green-600" : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}
+                                >
+                                    USD $
+                                </button>
+                            </div>
                         </div>
 
                         {/* Amount Input */}
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Enter Amount</label>
+                                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Enter Amount ({currency})</label>
                                 <div className="relative group">
-                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-3xl font-bold text-[var(--text-secondary)] group-focus-within:text-blue-600 dark:group-focus-within:text-blue-400 transition-colors">₹</span>
+                                    <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-3xl font-bold transition-colors ${currency === 'USD' ? 'text-green-500' : 'text-blue-500'}`}>
+                                        {currency === "INR" ? "₹" : "$"}
+                                    </span>
                                     <input
                                         type="number"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         placeholder="0.00"
-                                        className="w-full pl-10 pr-4 py-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-4xl font-bold text-[var(--text-primary)] outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-[var(--text-muted)]"
+                                        className="w-full pl-12 pr-4 py-5 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-4xl font-bold text-[var(--text-primary)] outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder:text-[var(--text-muted)]"
                                     />
                                 </div>
+                                {currency === "USD" && amount && (
+                                    <p className="text-xs text-[var(--text-secondary)] mt-2 flex items-center gap-1">
+                                        <RefreshCw size={10} />
+                                        Approx. ₹{(parseFloat(amount) * 84).toFixed(2)} will be credited
+                                    </p>
+                                )}
                             </div>
 
                             {/* Quick Select */}
@@ -141,10 +269,10 @@ export default function DepositPage() {
                                         key={amt}
                                         onClick={() => setAmount(amt.toString())}
                                         className={`py-2.5 rounded-xl text-sm font-bold transition-all border ${amount === amt.toString()
-                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/25 transform scale-105"
+                                            ? (currency === "USD" ? "bg-green-600 text-white border-green-600 shadow-lg" : "bg-blue-600 text-white border-blue-600 shadow-lg")
                                             : "bg-[var(--bg-secondary)] border-transparent text-[var(--text-secondary)] hover:bg-[var(--border-color)]"}`}
                                     >
-                                        +₹{amt}
+                                        +{currency === "INR" ? "₹" : "$"}{amt}
                                     </button>
                                 ))}
                             </div>
@@ -175,7 +303,10 @@ export default function DepositPage() {
                         <button
                             onClick={handleDeposit}
                             disabled={loading || !amount || parseFloat(amount) <= 0}
-                            className="w-full mt-8 py-4 rounded-2xl bg-[#3395ff] hover:bg-[#2886e6] text-white font-bold text-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-500/20 active:scale-[0.98]"
+                            className={`w-full mt-8 py-4 rounded-2xl text-white font-bold text-lg transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-xl active:scale-[0.98] ${currency === "USD"
+                                ? "bg-green-600 hover:bg-green-700 shadow-green-500/20"
+                                : "bg-[#3395ff] hover:bg-[#2886e6] shadow-blue-500/20"
+                                }`}
                         >
                             {loading ? (
                                 <>
@@ -184,7 +315,7 @@ export default function DepositPage() {
                                 </>
                             ) : (
                                 <>
-                                    <span>Pay {amount ? formatCurrency(parseFloat(amount)).replace("$", "₹") : ""}</span>
+                                    <span>Pay {amount ? displayCurrency(parseFloat(amount), currency) : ""}</span>
                                     <ArrowLeft className="rotate-180" size={20} />
                                 </>
                             )}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { formatCurrency, formatPercent } from "@/lib/utils";
+import { formatPercent } from "@/lib/utils";
+import { useCurrency } from "@/components/CurrencyProvider";
 import {
     TrendingUp,
     TrendingDown,
@@ -82,6 +83,7 @@ const generateChartData = (currentValue: number, balance: number) => {
 export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
+    const { formatPrice } = useCurrency();
 
     useEffect(() => {
         fetch("/api/portfolio")
@@ -168,13 +170,13 @@ export default function DashboardPage() {
                         <div>
                             <p className="text-[var(--text-secondary)] text-sm font-medium mb-1">Total Net Worth</p>
                             <h2 className="text-4xl font-extrabold text-[var(--text-primary)]">
-                                {formatCurrency(data.currentValue + data.balance)}
+                                {formatPrice(data.currentValue + data.balance)}
                             </h2>
                         </div>
                         <div className={`text-right ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                             <p className="text-lg font-bold flex items-center justify-end gap-1">
                                 {data.totalGainLoss >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                                {formatCurrency(Math.abs(data.totalGainLoss))}
+                                {formatPrice(Math.abs(data.totalGainLoss))}
                             </p>
                             <p className="text-xs font-semibold opacity-80">All time return</p>
                         </div>
@@ -197,7 +199,7 @@ export default function DashboardPage() {
                                         fontSize: 13,
                                         color: "var(--text-primary)",
                                     }}
-                                    formatter={(value: unknown) => [formatCurrency(Number(value)), "Net Worth"]}
+                                    formatter={(value: unknown) => [formatPrice(Number(value)), "Net Worth"]}
                                 />
                                 <Area
                                     type="monotone"
@@ -219,7 +221,7 @@ export default function DashboardPage() {
                             <span className="text-sm font-medium">Buying Power</span>
                         </div>
                         <div className="text-3xl font-bold text-[var(--text-primary)]">
-                            {formatCurrency(data.balance)}
+                            {formatPrice(data.balance)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">Available to trade</p>
                     </div>
@@ -230,7 +232,7 @@ export default function DashboardPage() {
                             <span className="text-sm font-medium">Invested Assets</span>
                         </div>
                         <div className="text-3xl font-bold text-[var(--text-primary)]">
-                            {formatCurrency(data.currentValue)}
+                            {formatPrice(data.currentValue)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">{data.portfolio.length} active positions</p>
                     </div>
@@ -241,7 +243,7 @@ export default function DashboardPage() {
                             <span className="text-sm font-medium">Total Profit/Loss</span>
                         </div>
                         <div className={`text-3xl font-bold ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                            {data.totalGainLoss >= 0 ? "+" : ""}{formatCurrency(data.totalGainLoss)}
+                            {data.totalGainLoss >= 0 ? "+" : ""}{formatPrice(data.totalGainLoss)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">Total investment returns</p>
                     </div>
@@ -278,9 +280,9 @@ export default function DashboardPage() {
                                         </div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="font-bold text-[var(--text-primary)]">{formatCurrency(item.currentValue)}</div>
+                                        <div className="font-bold text-[var(--text-primary)]">{formatPrice(item.currentValue)}</div>
                                         <div className={`text-xs font-semibold ${item.gainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                                            {item.gainLoss >= 0 ? "+" : ""}{formatCurrency(item.gainLoss)} ({item.gainLossPercent.toFixed(2)}%)
+                                            {item.gainLoss >= 0 ? "+" : ""}{formatPrice(item.gainLoss)} ({item.gainLossPercent.toFixed(2)}%)
                                         </div>
                                     </div>
                                 </Link>
@@ -310,7 +312,7 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="text-right">
                                     <div className="font-bold text-sm text-[var(--text-primary)]">
-                                        {formatCurrency(tx.totalAmount)}
+                                        {formatPrice(tx.totalAmount)}
                                     </div>
                                     <div className="text-xs text-[var(--text-secondary)]">
                                         {tx.shares ? `${tx.shares.toFixed(4)} shares` : "Completed"}

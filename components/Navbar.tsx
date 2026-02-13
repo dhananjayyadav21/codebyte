@@ -2,6 +2,7 @@
 
 import { Menu, Sun, Moon, Bell } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import { useCurrency } from "./CurrencyProvider";
 import { Logo } from "./Logo";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -12,7 +13,12 @@ interface NavbarProps {
 
 export default function Navbar({ onMenuClick }: NavbarProps) {
     const { theme, toggleTheme } = useTheme();
+    const { currency, setCurrency } = useCurrency();
     const [notifications, setNotifications] = useState<any[]>([]);
+
+    const toggleCurrency = () => {
+        setCurrency(currency === "INR" ? "USD" : "INR");
+    };
     const [unreadCount, setUnreadCount] = useState(0);
     const [showNotifications, setShowNotifications] = useState(false);
 
@@ -173,6 +179,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                     aria-label="Toggle theme"
                 >
                     {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+
+                {/* Currency Toggle */}
+                <button
+                    onClick={() => toggleCurrency()}
+                    className="flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm hover:bg-[var(--bg-secondary)] transition-colors border border-[var(--border-color)] ml-2"
+                >
+                    {currency === "INR" ? "₹" : "$"}
                 </button>
 
                 <div
