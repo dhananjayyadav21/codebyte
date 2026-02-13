@@ -6,9 +6,9 @@ import {
     LayoutDashboard,
     TrendingUp,
     BookOpen,
-    LogIn,
+    UserCircle,
+    LogOut,
     X,
-    Sparkles,
 } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -16,6 +16,7 @@ const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/stocks", label: "Stocks", icon: TrendingUp },
     { href: "/learn", label: "Learn", icon: BookOpen },
+    { href: "/profile", label: "Profile", icon: UserCircle },
 ];
 
 interface SidebarProps {
@@ -102,25 +103,30 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
                 {/* Bottom */}
                 <div style={{ padding: "16px 12px", borderTop: "1px solid var(--border-color)" }}>
-                    <Link
-                        href="/login"
-                        onClick={onClose}
+                    <button
+                        onClick={async () => {
+                            await fetch("/api/auth/logout", { method: "POST" });
+                            window.location.href = "/login";
+                        }}
                         style={{
                             display: "flex",
                             alignItems: "center",
                             gap: 12,
                             padding: "12px 16px",
                             borderRadius: 12,
-                            textDecoration: "none",
                             fontSize: 14,
                             fontWeight: 500,
-                            color: "var(--text-secondary)",
+                            color: "var(--red)",
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            width: "100%",
                             transition: "all 0.2s ease",
                         }}
                     >
-                        <LogIn size={20} />
-                        Login
-                    </Link>
+                        <LogOut size={20} />
+                        Logout
+                    </button>
                 </div>
             </aside>
         </>

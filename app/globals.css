@@ -232,6 +232,12 @@ body {
   color: white;
 }
 
+/* ========= Spinner ========= */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* ========= Responsive sidebar push ========= */
 .main-content {
   margin-left: 260px;
