@@ -22,6 +22,7 @@ export interface IUser extends Document {
     lastLoginIP: string | null;
     createdAt: Date;
     updatedAt: Date;
+    balance: number;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -45,6 +46,7 @@ const UserSchema = new Schema<IUser>(
         lockUntil: { type: Date, default: null },
         lastLogin: { type: Date, default: null },
         lastLoginIP: { type: String, default: null },
+        balance: { type: Number, default: 10000 },
     },
     { timestamps: true }
 );
