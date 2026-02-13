@@ -48,6 +48,7 @@ export interface Lesson {
     duration: string;
     difficulty: "Beginner" | "Intermediate" | "Advanced";
     icon: string;
+    content: string;
 }
 
 function generateHistory(basePrice: number, days: number = 90): { date: string; price: number }[] {
@@ -200,13 +201,199 @@ export const portfolioHistory = (() => {
 })();
 
 export const lessons: Lesson[] = [
-    { id: "l1", title: "What is Fractional Investing?", description: "Learn how you can own a piece of any stock, even expensive ones, starting from just $1.", category: "Basics", duration: "5 min", difficulty: "Beginner", icon: "📊" },
-    { id: "l2", title: "Understanding Stock Prices", description: "Discover what makes stock prices go up and down, and how market forces work.", category: "Basics", duration: "8 min", difficulty: "Beginner", icon: "📈" },
-    { id: "l3", title: "Risk vs. Reward", description: "Every investment has risk. Learn how to balance potential gains with possible losses.", category: "Strategy", duration: "10 min", difficulty: "Beginner", icon: "⚖️" },
-    { id: "l4", title: "Building a Diversified Portfolio", description: "Don't put all your eggs in one basket. Learn the art of diversification.", category: "Strategy", duration: "12 min", difficulty: "Intermediate", icon: "🧺" },
-    { id: "l5", title: "Reading Financial Statements", description: "Understand the basics of balance sheets, income statements, and cash flow.", category: "Analysis", duration: "15 min", difficulty: "Intermediate", icon: "📋" },
-    { id: "l6", title: "What is P/E Ratio?", description: "One of the most important metrics to evaluate if a stock is overpriced or a bargain.", category: "Analysis", duration: "7 min", difficulty: "Beginner", icon: "🔢" },
-    { id: "l7", title: "Dollar-Cost Averaging", description: "A simple strategy to reduce the impact of volatility on your investments.", category: "Strategy", duration: "6 min", difficulty: "Beginner", icon: "💰" },
-    { id: "l8", title: "Understanding Market Cycles", description: "Markets go through boom and bust cycles. Learn how to navigate them.", category: "Advanced", duration: "20 min", difficulty: "Advanced", icon: "🔄" },
-    { id: "l9", title: "Introduction to ETFs", description: "Exchange-traded funds let you invest in a basket of stocks at once. Learn how.", category: "Basics", duration: "8 min", difficulty: "Beginner", icon: "📦" },
+    {
+        id: "l1",
+        title: "What is Fractional Investing?",
+        description: "Learn how you can own a piece of any stock, even expensive ones, starting from just $1.",
+        category: "Basics",
+        duration: "5 min",
+        difficulty: "Beginner",
+        icon: "📊",
+        content: `
+## Introduction to Fractional Investing
+
+Fractional investing is a way to buy a portion of a share of stock or an ETF (Exchange-Traded Fund) rather than the entire share. This allows you to invest in expensive companies like Amazon or Google with as little as $1.
+
+### How it Works
+Traditionally, if a stock cost $3,000 per share, you would need at least $3,000 to invest. With fractional shares, you can decide how much money you want to invest (e.g., $50), and the broker will allocate you the corresponding fraction of the share (e.g., 0.016 shares).
+
+### Benefits
+1. **Accessibility**: Start investing with small amounts of money.
+2. **Diversification**: Spread your capital across many different stocks instead of just one or two.
+3. ** Dollar-Cost Averaging**: Easier to invest a fixed amount regularly.
+
+### Dividends
+Yes! You still earn dividends on fractional shares, proportional to the fraction you own.
+        `
+    },
+    {
+        id: "l2",
+        title: "Understanding Stock Prices",
+        description: "Discover what makes stock prices go up and down, and how market forces work.",
+        category: "Basics",
+        duration: "8 min",
+        difficulty: "Beginner",
+        icon: "📈",
+        content: `
+## What Determines a Stock Price?
+
+Stock prices are determined by supply and demand in the market.
+
+### Key Factors
+* **Earnings Reports**: How much profit the company is making.
+* **Economic Indicators**: Inflation, interest rates, and GDP growth.
+* **Sentiment**: How investors *feel* about the company's future.
+
+### Market Cap
+Price is just one part of the story. The **Market Capitalization** (Market Cap) is the total value of the company, calculated as:
+\`Market Cap = Share Price × Total Number of Shares\`
+        `
+    },
+    {
+        id: "l3",
+        title: "Risk vs. Reward",
+        description: "Every investment has risk. Learn how to balance potential gains with possible losses.",
+        category: "Strategy",
+        duration: "10 min",
+        difficulty: "Beginner",
+        icon: "⚖️",
+        content: `
+## The Risk/Reward Trade-off
+
+In investing, higher potential returns usually come with higher risk.
+
+### Types of Risk
+* **Market Risk**: The risk of the overall market declining.
+* **Company Risk**: The risk of a specific company failing.
+* **Inflation Risk**: The risk that your money loses purchasing power over time.
+
+### Managing Risk
+You cannot eliminate risk, but you can manage it through **diversification** and a long-time horizon.
+        `
+    },
+    {
+        id: "l4",
+        title: "Building a Diversified Portfolio",
+        description: "Don't put all your eggs in one basket. Learn the art of diversification.",
+        category: "Strategy",
+        duration: "12 min",
+        difficulty: "Intermediate",
+        icon: "🧺",
+        content: `
+## The Art of Diversification
+
+Diversification means spreading your investments across different assets to reduce risk.
+
+### Ways to Diversify
+1. **By Asset Class**: Stocks, Bonds, Real Estate, Crypto.
+2. **By Sector**: Tech, Healthcare, Energy, Finance.
+3. **By Geography**: US, Europe, Emerging Markets.
+
+A simple way to achieve instant diversification is by investing in **ETFs** (Exchange Traded Funds) that track a broad index like the S&P 500.
+        `
+    },
+    {
+        id: "l5",
+        title: "Reading Financial Statements",
+        description: "Understand the basics of balance sheets, income statements, and cash flow.",
+        category: "Analysis",
+        duration: "15 min",
+        difficulty: "Intermediate",
+        icon: "📋",
+        content: `
+## Financial Statements 101
+
+Three key documents tell you the financial health of a company:
+
+1. **Income Statement**: Shows revenue, expenses, and profit (Net Income) over a period.
+2. **Balance Sheet**: A snapshot of what the company owns (Assets) and what it owes (Liabilities) at a specific moment.
+3. **Cash Flow Statement**: Tracks the actual cash entering and leaving the company.
+        `
+    },
+    {
+        id: "l6",
+        title: "What is P/E Ratio?",
+        description: "One of the most important metrics to evaluate if a stock is overpriced or a bargain.",
+        category: "Analysis",
+        duration: "7 min",
+        difficulty: "Beginner",
+        icon: "🔢",
+        content: `
+## Price-to-Earnings (P/E) Ratio
+
+The P/E ratio measures a company's current share price relative to its per-share earnings.
+
+### Formula
+\`P/E = Share Price / Earnings Per Share (EPS)\`
+
+### How to Use It
+* **High P/E**: Investors expect high growth in the future, or the stock might be overvalued.
+* **Low P/E**: The company might be undervalued, or investors are pessimistic about its future.
+* **Compare**: Always compare P/E ratios with other companies in the *same industry*.
+        `
+    },
+    {
+        id: "l7",
+        title: "Dollar-Cost Averaging",
+        description: "A simple strategy to reduce the impact of volatility on your investments.",
+        category: "Strategy",
+        duration: "6 min",
+        difficulty: "Beginner",
+        icon: "💰",
+        content: `
+## Dollar-Cost Averaging (DCA)
+
+DCA is the strategy of investing the same amount of money at regular intervals (e.g., $100 every month), regardless of the share price.
+
+### Why it Works
+* **Removes Emotion**: You invest automatically without trying to "time the market".
+* **Buys More Low**: When prices are low, your $100 buys more shares.
+* **Buys Less High**: When prices are high, your $100 buys fewer shares.
+
+Over time, this often lowers your average cost per share.
+        `
+    },
+    {
+        id: "l8",
+        title: "Understanding Market Cycles",
+        description: "Markets go through boom and bust cycles. Learn how to navigate them.",
+        category: "Advanced",
+        duration: "20 min",
+        difficulty: "Advanced",
+        icon: "🔄",
+        content: `
+## Market Cycles
+
+Markets naturally move in cycles of expansion and contraction.
+
+### Phases
+1. **Accumulation**: Smart money starts buying after a crash.
+2. **Mark-Up (Bull Market)**: Prices rise, public jumps in.
+3. **Distribution**: Smart money starts selling.
+4. **Mark-Down (Bear Market)**: Prices fall, panic selling occurs.
+
+Understanding where we are in the cycle can help manage expectations, though timing it perfectly is nearly impossible.
+        `
+    },
+    {
+        id: "l9",
+        title: "Introduction to ETFs",
+        description: "Exchange-traded funds let you invest in a basket of stocks at once. Learn how.",
+        category: "Basics",
+        duration: "8 min",
+        difficulty: "Beginner",
+        icon: "📦",
+        content: `
+## What is an ETF?
+
+An ETF (Exchange-Traded Fund) is a type of investment fund that is traded on stock exchanges, much like stocks.
+
+### Key Features
+* **Basket of Assets**: An ETF holds multiple underlying assets (stocks, commodities, or bonds).
+* **Tradable**: You can buy and sell them throughout the trading day.
+* **Low Fees**: Generally have lower expense ratios than mutual funds.
+
+Popular ETFs include **SPY** (tracks S&P 500) and **QQQ** (tracks Nasdaq 100).
+        `
+    },
 ];

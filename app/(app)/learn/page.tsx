@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { lessons } from "@/lib/mock-data";
 import { BookOpen, Clock, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -13,33 +14,26 @@ export default function LearnPage() {
     const filtered = filter === "All" ? lessons : lessons.filter((l) => l.difficulty === filter);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="flex flex-col gap-6">
             <div>
-                <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-primary)", marginBottom: 4 }}>
+                <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] mb-1">
                     Learn Investing
                 </h1>
-                <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
+                <p className="text-sm text-[var(--text-secondary)]">
                     Beginner-friendly lessons to build your investing knowledge.
                 </p>
             </div>
 
             {/* Difficulty Filter */}
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div className="flex flex-wrap gap-2">
                 {(["All", "Beginner", "Intermediate", "Advanced"] as DifficultyFilter[]).map((d) => (
                     <button
                         key={d}
                         onClick={() => setFilter(d)}
-                        style={{
-                            padding: "8px 18px",
-                            borderRadius: 10,
-                            border: "1px solid var(--border-color)",
-                            background: filter === d ? "var(--accent)" : "var(--bg-card)",
-                            color: filter === d ? "white" : "var(--text-secondary)",
-                            fontSize: 13,
-                            fontWeight: 600,
-                            cursor: "pointer",
-                            transition: "all 0.2s ease",
-                        }}
+                        className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${filter === d
+                            ? "bg-[var(--accent)] text-white border-transparent shadow-md"
+                            : "bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-color)] hover:border-[var(--text-secondary)]"
+                            }`}
                     >
                         {d}
                     </button>
@@ -47,105 +41,55 @@ export default function LearnPage() {
             </div>
 
             {/* Lesson Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16 }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filtered.map((lesson, i) => (
                     <div
                         key={lesson.id}
-                        className="card animate-fade-in-up"
+                        className="card p-6 cursor-pointer animate-fade-in-up hover:shadow-lg transition-all"
                         style={{
-                            padding: 24,
-                            cursor: "pointer",
                             animationDelay: `${i * 0.05}s`,
                         }}
                         onClick={() => setExpandedId(expandedId === lesson.id ? null : lesson.id)}
                     >
-                        <div style={{ display: "flex", alignItems: "start", gap: 14 }}>
-                            <div
-                                style={{
-                                    width: 48,
-                                    height: 48,
-                                    borderRadius: 14,
-                                    background: "var(--bg-secondary)",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    fontSize: 24,
-                                    flexShrink: 0,
-                                }}
-                            >
+                        <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-2xl flex-shrink-0">
                                 {lesson.icon}
                             </div>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-                                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex justify-between items-start">
+                                    <h3 className="text-base font-bold text-[var(--text-primary)] mb-1 leading-snug">
                                         {lesson.title}
                                     </h3>
-                                    {expandedId === lesson.id ? (
-                                        <ChevronUp size={18} color="var(--text-muted)" />
-                                    ) : (
-                                        <ChevronDown size={18} color="var(--text-muted)" />
-                                    )}
+                                    <div className="text-[var(--text-muted)] mt-1">
+                                        {expandedId === lesson.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                    </div>
                                 </div>
-                                <div style={{ display: "flex", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
-                                    <span
-                                        style={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            gap: 4,
-                                            fontSize: 12,
-                                            color: "var(--text-muted)",
-                                        }}
-                                    >
+                                <div className="flex flex-wrap gap-2 mb-2 items-center">
+                                    <span className="inline-flex items-center gap-1 text-xs text-[var(--text-muted)]">
                                         <Clock size={12} /> {lesson.duration}
                                     </span>
-                                    <span
-                                        style={{
-                                            padding: "2px 8px",
-                                            borderRadius: 6,
-                                            fontSize: 11,
-                                            fontWeight: 600,
-                                            background:
-                                                lesson.difficulty === "Beginner"
-                                                    ? "var(--green-bg)"
-                                                    : lesson.difficulty === "Intermediate"
-                                                        ? "var(--yellow-bg)"
-                                                        : "var(--red-bg)",
-                                            color:
-                                                lesson.difficulty === "Beginner"
-                                                    ? "var(--green)"
-                                                    : lesson.difficulty === "Intermediate"
-                                                        ? "var(--yellow)"
-                                                        : "var(--red)",
-                                        }}
-                                    >
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${lesson.difficulty === "Beginner"
+                                        ? "bg-[var(--green-bg)] text-[var(--green)]"
+                                        : lesson.difficulty === "Intermediate"
+                                            ? "bg-[var(--yellow-bg)] text-[var(--yellow)]"
+                                            : "bg-[var(--red-bg)] text-[var(--red)]"
+                                        }`}>
                                         {lesson.difficulty}
                                     </span>
-                                    <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                                        {lesson.category}
-                                    </span>
+                                    <span className="text-xs text-[var(--text-muted)]">• {lesson.category}</span>
                                 </div>
+
                                 {expandedId === lesson.id && (
-                                    <div className="animate-fade-in">
-                                        <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, marginBottom: 12 }}>
+                                    <div className="animate-fade-in mt-3 pt-3 border-t border-[var(--border-color)]">
+                                        <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
                                             {lesson.description}
                                         </p>
-                                        <button
-                                            style={{
-                                                display: "inline-flex",
-                                                alignItems: "center",
-                                                gap: 6,
-                                                padding: "8px 16px",
-                                                borderRadius: 10,
-                                                background: "var(--gradient-card)",
-                                                color: "white",
-                                                border: "none",
-                                                fontSize: 13,
-                                                fontWeight: 600,
-                                                cursor: "pointer",
-                                            }}
+                                        <Link
+                                            href={`/learn/${lesson.id}`}
+                                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--gradient-card)] text-white text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 no-underline"
                                         >
-                                            <BookOpen size={14} /> Start Lesson
-                                        </button>
+                                            <BookOpen size={16} /> Start Lesson
+                                        </Link>
                                     </div>
                                 )}
                             </div>

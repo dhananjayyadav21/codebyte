@@ -135,207 +135,221 @@ export default function ProfilePage() {
 
     if (loading) {
         return (
-            <div style={{ padding: 32, display: "flex", justifyContent: "center" }}>
-                <div className="skeleton" style={{ width: "100%", maxWidth: 700, height: 400 }} />
+            <div className="p-8 flex justify-center">
+                <div className="skeleton w-full max-w-3xl h-96" />
             </div>
         );
     }
 
     if (!user) return null;
 
-    const cardStyle = { background: "var(--bg-card)", borderRadius: 16, border: "1px solid var(--border-color)", padding: 24, marginBottom: 20 };
     const labelStyle = { fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 4 };
     const valueStyle = { fontSize: 15, color: "var(--text-primary)", fontWeight: 500 };
     const inputStyle = { width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--text-primary)", fontSize: 14, outline: "none" };
 
     return (
-        <div style={{ padding: "24px 32px", maxWidth: 800, margin: "0 auto" }}>
+        <div className="p-4 md:p-8 max-w-7xl mx-auto">
             {/* Toast */}
             {toast.show && (
                 <div className={`toast toast-${toast.type}`}>{toast.message}</div>
             )}
 
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <div>
-                    <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-primary)" }}>My Profile</h1>
-                    <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>Manage your account settings and security</p>
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">My Profile</h1>
+                    <p className="text-sm text-[var(--text-secondary)]">Manage your account settings and security</p>
                 </div>
-                <button onClick={handleLogout} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 20px", borderRadius: 12, border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--red)", fontSize: 14, fontWeight: 600, cursor: "pointer" }}>
+                <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--red)] text-sm font-semibold hover:bg-[var(--red-bg)] transition-colors">
                     <LogOut size={16} /> Logout
                 </button>
             </div>
 
-            {/* Tabs */}
-            <div style={{ display: "flex", gap: 4, marginBottom: 24, background: "var(--bg-secondary)", borderRadius: 12, padding: 4 }}>
-                {[
-                    { key: "info" as const, label: "Personal Info", icon: User },
-                    { key: "security" as const, label: "Security", icon: Shield },
-                ].map((t) => (
-                    <button key={t.key} onClick={() => setTab(t.key)} style={{ flex: 1, padding: "10px 16px", borderRadius: 10, border: "none", background: tab === t.key ? "var(--bg-card)" : "transparent", color: tab === t.key ? "var(--text-primary)" : "var(--text-secondary)", fontWeight: 600, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, boxShadow: tab === t.key ? "var(--shadow-sm)" : "none", transition: "all 0.2s" }}>
-                        <t.icon size={16} /> {t.label}
-                    </button>
-                ))}
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
-            {tab === "info" && (
-                <>
-                    {/* User Card */}
-                    <div style={{ ...cardStyle, display: "flex", alignItems: "center", gap: 20 }}>
-                        <div style={{ width: 64, height: 64, borderRadius: "50%", background: "var(--gradient-card)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                            <User size={28} color="white" />
+                {/* Left Column: User Card */}
+                <div className="lg:col-span-4 flex flex-col gap-6">
+                    <div className="card p-6 flex flex-col items-center text-center">
+                        <div className="w-24 h-24 rounded-full bg-[var(--gradient-card)] flex items-center justify-center mb-4 shadow-lg ring-4 ring-[var(--bg-secondary)]">
+                            <User size={40} color="white" />
                         </div>
-                        <div style={{ flex: 1 }}>
-                            <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)" }}>{user.fullName}</h2>
-                            <p style={{ fontSize: 14, color: "var(--text-secondary)" }}>{user.email}</p>
-                            <div style={{ marginTop: 6, display: "flex", gap: 8 }}>
-                                <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 20, background: user.isVerified ? "var(--green-bg)" : "var(--red-bg)", color: user.isVerified ? "var(--green)" : "var(--red)", fontWeight: 600 }}>
-                                    {user.isVerified ? "Verified" : "Unverified"}
-                                </span>
-                                <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 20, background: "var(--bg-secondary)", color: "var(--text-muted)", fontWeight: 600 }}>
-                                    Member since {new Date(user.createdAt).toLocaleDateString()}
-                                </span>
-                            </div>
+                        <h2 className="text-xl font-bold text-[var(--text-primary)]">{user.fullName}</h2>
+                        <p className="text-sm text-[var(--text-secondary)] mb-4">{user.email}</p>
+
+                        <div className="flex flex-wrap justify-center gap-2 mb-6">
+                            <span className={`text-[11px] px-3 py-1 rounded-full font-semibold ${user.isVerified ? "bg-[var(--green-bg)] text-[var(--green)]" : "bg-[var(--red-bg)] text-[var(--red)]"}`}>
+                                {user.isVerified ? "Verified" : "Unverified"}
+                            </span>
+                            <span className="text-[11px] px-3 py-1 rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)] font-semibold">
+                                Member since {new Date(user.createdAt).toLocaleDateString()}
+                            </span>
                         </div>
+
                         {!editing && (
-                            <button onClick={() => setEditing(true)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 10, border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--accent)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>
-                                <Edit3 size={14} /> Edit
+                            <button onClick={() => setEditing(true)} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--accent)] text-sm font-semibold hover:bg-[var(--bg-secondary)] transition-colors">
+                                <Edit3 size={16} /> Edit Profile
                             </button>
                         )}
                     </div>
+                </div>
 
-                    {/* Details */}
-                    <div style={cardStyle}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Personal Information</h3>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                            {[
-                                { icon: User, label: "Full Name", value: user.fullName, key: "fullName", editable: true },
-                                { icon: Mail, label: "Email", value: user.email, key: "email", editable: false },
-                                { icon: Phone, label: "Phone", value: user.phone, key: "phone", editable: true },
-                                { icon: Calendar, label: "Date of Birth", value: user.dob, key: "dob", editable: false },
-                            ].map((f) => (
-                                <div key={f.key}>
-                                    <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
-                                        <f.icon size={12} /> {f.label}
+                {/* Right Column: Tabs & Content */}
+                <div className="lg:col-span-8 flex flex-col gap-6">
+                    {/* Tabs */}
+                    <div className="flex gap-1 bg-[var(--bg-secondary)] rounded-xl p-1">
+                        {[
+                            { key: "info" as const, label: "Personal Info", icon: User },
+                            { key: "security" as const, label: "Security", icon: Shield },
+                        ].map((t) => (
+                            <button
+                                key={t.key}
+                                onClick={() => setTab(t.key)}
+                                className={`flex-1 py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold transition-all ${tab === t.key ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm" : "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                                    }`}
+                            >
+                                <t.icon size={16} /> {t.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {tab === "info" && (
+                        <div className="flex flex-col gap-6">
+                            {/* Details */}
+                            <div className="card p-6">
+                                <h3 className="text-base font-bold text-[var(--text-primary)] mb-5">Personal Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {[
+                                        { icon: User, label: "Full Name", value: user.fullName, key: "fullName", editable: true },
+                                        { icon: Mail, label: "Email", value: user.email, key: "email", editable: false },
+                                        { icon: Phone, label: "Phone", value: user.phone, key: "phone", editable: true },
+                                        { icon: Calendar, label: "Date of Birth", value: user.dob, key: "dob", editable: false },
+                                    ].map((f) => (
+                                        <div key={f.key}>
+                                            <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
+                                                <f.icon size={12} /> {f.label}
+                                            </div>
+                                            {editing && f.editable ? (
+                                                <input value={editForm[f.key as keyof typeof editForm] || ""} onChange={(e) => setEditForm({ ...editForm, [f.key]: e.target.value })} style={inputStyle} />
+                                            ) : (
+                                                <div style={valueStyle}>{f.value || "—"}</div>
+                                            )}
+                                        </div>
+                                    ))}
+                                    <div className="col-span-1 md:col-span-2">
+                                        <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
+                                            <MapPin size={12} /> Address
+                                        </div>
+                                        {editing ? (
+                                            <textarea value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} rows={2} style={{ ...inputStyle, resize: "vertical" as const }} />
+                                        ) : (
+                                            <div style={valueStyle}>{user.address || "—"}</div>
+                                        )}
                                     </div>
-                                    {editing && f.editable ? (
-                                        <input value={editForm[f.key as keyof typeof editForm] || ""} onChange={(e) => setEditForm({ ...editForm, [f.key]: e.target.value })} style={inputStyle} />
-                                    ) : (
-                                        <div style={valueStyle}>{f.value || "—"}</div>
-                                    )}
                                 </div>
-                            ))}
-                            <div style={{ gridColumn: "1 / -1" }}>
-                                <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}>
-                                    <MapPin size={12} /> Address
+
+                                {editing && (
+                                    <div className="flex gap-3 mt-6">
+                                        <button onClick={handleSaveProfile} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                            <Save size={16} /> Save Changes
+                                        </button>
+                                        <button onClick={() => setEditing(false)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] font-semibold hover:bg-[var(--bg-secondary)] transition-colors">
+                                            <X size={16} /> Cancel
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Financial Details */}
+                            <div className="card p-6">
+                                <h3 className="text-base font-bold text-[var(--text-primary)] mb-5">Financial Information</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {[
+                                        { icon: FileText, label: "PAN", value: user.pan },
+                                        { icon: CreditCard, label: "Bank Account", value: user.bankAccount ? "••••" + user.bankAccount.slice(-4) : "—" },
+                                        { icon: Building, label: "IFSC Code", value: user.ifscCode },
+                                    ].map((f) => (
+                                        <div key={f.label}>
+                                            <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><f.icon size={12} /> {f.label}</div>
+                                            <div style={valueStyle}>{f.value || "—"}</div>
+                                        </div>
+                                    ))}
                                 </div>
-                                {editing ? (
-                                    <textarea value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} rows={2} style={{ ...inputStyle, resize: "vertical" as const }} />
+                            </div>
+                        </div>
+                    )}
+
+                    {tab === "security" && (
+                        <div className="flex flex-col gap-6">
+                            {/* Change Password */}
+                            <div className="card p-6">
+                                <h3 className="text-base font-bold text-[var(--text-primary)] mb-1">Change Password</h3>
+                                <p className="text-sm text-[var(--text-secondary)] mb-5">Update your password regularly for better security.</p>
+
+                                {!changingPassword ? (
+                                    <button onClick={() => setChangingPassword(true)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                        <Lock size={16} /> Change Password
+                                    </button>
                                 ) : (
-                                    <div style={valueStyle}>{user.address || "—"}</div>
+                                    <div className="flex flex-col gap-4 max-w-md">
+                                        {pwError && <div className="p-3 rounded-lg bg-[var(--red-bg)] text-[var(--red)] text-sm">{pwError}</div>}
+                                        <div className="relative">
+                                            <input type={showPassword ? "text" : "password"} placeholder="Current password" value={pwForm.currentPassword} onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })} style={inputStyle} />
+                                            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </button>
+                                        </div>
+                                        <input type="password" placeholder="New password" value={pwForm.newPassword} onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })} style={inputStyle} />
+                                        <input type="password" placeholder="Confirm new password" value={pwForm.confirmPassword} onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })} style={inputStyle} />
+                                        <div className="flex gap-3 mt-2">
+                                            <button onClick={handleChangePassword} className="px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold hover:shadow-lg transition-all">Save</button>
+                                            <button onClick={() => { setChangingPassword(false); setPwError(""); }} className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] font-semibold hover:bg-[var(--bg-secondary)]">Cancel</button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Session Info */}
+                            <div className="card p-6">
+                                <h3 className="text-base font-bold text-[var(--text-primary)] mb-5">Session Info</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} /> Last Login</div>
+                                        <div style={valueStyle}>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "—"}</div>
+                                    </div>
+                                    <div>
+                                        <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><Globe size={12} /> IP Address</div>
+                                        <div style={valueStyle}>{user.lastLoginIP || "—"}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Activity Log */}
+                            <div className="card p-6">
+                                <h3 className="text-base font-bold text-[var(--text-primary)] mb-5 flex items-center gap-2">
+                                    <Activity size={18} /> Security Activity
+                                </h3>
+                                {logs.length === 0 ? (
+                                    <p className="text-sm text-[var(--text-muted)]">No activity yet.</p>
+                                ) : (
+                                    <div className="flex flex-col gap-2">
+                                        {logs.map((log) => (
+                                            <div key={log._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 rounded-xl bg-[var(--bg-secondary)] text-sm gap-2">
+                                                <div>
+                                                    <span className="font-semibold text-[var(--text-primary)] capitalize">{log.action.replace("_", " ")}</span>
+                                                    {log.detail && <span className="text-[var(--text-muted)] ml-2">— {log.detail}</span>}
+                                                </div>
+                                                <div className="text-[var(--text-muted)] text-xs whitespace-nowrap">
+                                                    {new Date(log.createdAt).toLocaleString()}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
                         </div>
-
-                        {editing && (
-                            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-                                <button onClick={handleSaveProfile} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 24px", borderRadius: 10, border: "none", background: "var(--gradient-card)", color: "white", fontWeight: 600, cursor: "pointer" }}>
-                                    <Save size={16} /> Save
-                                </button>
-                                <button onClick={() => setEditing(false)} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 24px", borderRadius: 10, border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--text-secondary)", fontWeight: 600, cursor: "pointer" }}>
-                                    <X size={16} /> Cancel
-                                </button>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Financial Details (read-only) */}
-                    <div style={cardStyle}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Financial Information</h3>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                            {[
-                                { icon: FileText, label: "PAN", value: user.pan },
-                                { icon: CreditCard, label: "Bank Account", value: user.bankAccount ? "••••" + user.bankAccount.slice(-4) : "—" },
-                                { icon: Building, label: "IFSC Code", value: user.ifscCode },
-                            ].map((f) => (
-                                <div key={f.label}>
-                                    <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><f.icon size={12} /> {f.label}</div>
-                                    <div style={valueStyle}>{f.value || "—"}</div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </>
-            )}
-
-            {tab === "security" && (
-                <>
-                    {/* Change Password */}
-                    <div style={cardStyle}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Change Password</h3>
-                        <p style={{ fontSize: 13, color: "var(--text-secondary)", marginBottom: 16 }}>Update your password regularly for better security.</p>
-
-                        {!changingPassword ? (
-                            <button onClick={() => setChangingPassword(true)} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 24px", borderRadius: 10, border: "none", background: "var(--gradient-card)", color: "white", fontWeight: 600, cursor: "pointer" }}>
-                                <Lock size={16} /> Change Password
-                            </button>
-                        ) : (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400 }}>
-                                {pwError && <div style={{ padding: "10px 14px", borderRadius: 10, background: "var(--red-bg)", color: "var(--red)", fontSize: 13 }}>{pwError}</div>}
-                                <div style={{ position: "relative" }}>
-                                    <input type={showPassword ? "text" : "password"} placeholder="Current password" value={pwForm.currentPassword} onChange={(e) => setPwForm({ ...pwForm, currentPassword: e.target.value })} style={inputStyle} />
-                                    <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}>{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button>
-                                </div>
-                                <input type="password" placeholder="New password" value={pwForm.newPassword} onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })} style={inputStyle} />
-                                <input type="password" placeholder="Confirm new password" value={pwForm.confirmPassword} onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })} style={inputStyle} />
-                                <div style={{ display: "flex", gap: 12 }}>
-                                    <button onClick={handleChangePassword} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "var(--gradient-card)", color: "white", fontWeight: 600, cursor: "pointer" }}>Save</button>
-                                    <button onClick={() => { setChangingPassword(false); setPwError(""); }} style={{ padding: "10px 24px", borderRadius: 10, border: "1px solid var(--border-color)", background: "var(--bg-primary)", color: "var(--text-secondary)", fontWeight: 600, cursor: "pointer" }}>Cancel</button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Last Login */}
-                    <div style={cardStyle}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>Session Info</h3>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-                            <div>
-                                <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} /> Last Login</div>
-                                <div style={valueStyle}>{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "—"}</div>
-                            </div>
-                            <div>
-                                <div style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 4 }}><Globe size={12} /> IP Address</div>
-                                <div style={valueStyle}>{user.lastLoginIP || "—"}</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Activity Log */}
-                    <div style={cardStyle}>
-                        <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-                            <Activity size={18} /> Security Activity
-                        </h3>
-                        {logs.length === 0 ? (
-                            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>No activity yet.</p>
-                        ) : (
-                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                                {logs.map((log) => (
-                                    <div key={log._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", borderRadius: 10, background: "var(--bg-secondary)", fontSize: 13 }}>
-                                        <div>
-                                            <span style={{ fontWeight: 600, color: "var(--text-primary)", textTransform: "capitalize" }}>{log.action.replace("_", " ")}</span>
-                                            {log.detail && <span style={{ color: "var(--text-muted)", marginLeft: 8 }}>— {log.detail}</span>}
-                                        </div>
-                                        <div style={{ color: "var(--text-muted)", fontSize: 12, whiteSpace: "nowrap" }}>
-                                            {new Date(log.createdAt).toLocaleString()}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

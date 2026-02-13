@@ -32,61 +32,35 @@ export default function StocksPage() {
         });
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="flex flex-col gap-6">
             <div>
-                <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-primary)", marginBottom: 4 }}>
+                <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)] mb-1">
                     Stocks
                 </h1>
-                <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
+                <p className="text-sm text-[var(--text-secondary)]">
                     Explore and invest in fractional shares of top companies.
                 </p>
             </div>
 
             {/* Search & Filter Bar */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <div
-                    style={{
-                        flex: 1,
-                        minWidth: 240,
-                        position: "relative",
-                    }}
-                >
+            <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1 relative">
                     <Search
                         size={18}
-                        style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--text-muted)" }}
+                        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
                     />
                     <input
                         type="text"
                         placeholder="Search stocks..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        style={{
-                            width: "100%",
-                            padding: "12px 14px 12px 42px",
-                            borderRadius: 12,
-                            border: "1px solid var(--border-color)",
-                            background: "var(--bg-card)",
-                            color: "var(--text-primary)",
-                            fontSize: 14,
-                            outline: "none",
-                        }}
+                        className="w-full py-3 pl-10 pr-4 rounded-xl border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] text-sm outline-none focus:border-[var(--accent)] transition-colors"
                     />
                 </div>
                 <button
                     onClick={() => setShowFilters(!showFilters)}
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 8,
-                        padding: "12px 16px",
-                        borderRadius: 12,
-                        border: "1px solid var(--border-color)",
-                        background: "var(--bg-card)",
-                        color: "var(--text-secondary)",
-                        fontSize: 14,
-                        cursor: "pointer",
-                        fontWeight: 500,
-                    }}
+                    className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-[var(--border-color)] text-sm font-medium transition-colors ${showFilters ? "bg-[var(--accent)] text-white border-transparent" : "bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)]"
+                        }`}
                 >
                     <SlidersHorizontal size={16} />
                     Filters
@@ -95,42 +69,28 @@ export default function StocksPage() {
 
             {/* Filters */}
             {showFilters && (
-                <div className="card animate-fade-in" style={{ padding: 20, display: "flex", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>Risk:</span>
+                <div className="card p-5 animate-fade-in flex flex-col sm:flex-row gap-4 flex-wrap items-start sm:items-center">
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Risk:</span>
                         {(["All", "Low", "Medium", "High"] as RiskFilter[]).map((r) => (
                             <button
                                 key={r}
                                 onClick={() => setRiskFilter(r)}
-                                style={{
-                                    padding: "6px 14px",
-                                    borderRadius: 8,
-                                    border: "1px solid var(--border-color)",
-                                    background: riskFilter === r ? "var(--accent)" : "transparent",
-                                    color: riskFilter === r ? "white" : "var(--text-secondary)",
-                                    fontSize: 13,
-                                    fontWeight: 500,
-                                    cursor: "pointer",
-                                }}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${riskFilter === r
+                                    ? "bg-[var(--accent)] text-white border-transparent"
+                                    : "bg-transparent text-[var(--text-secondary)] border-[var(--border-color)] hover:border-[var(--text-secondary)]"
+                                    }`}
                             >
                                 {r}
                             </button>
                         ))}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>Sort:</span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Sort:</span>
                         <select
                             value={sortBy}
                             onChange={(e) => setSortBy(e.target.value as SortKey)}
-                            style={{
-                                padding: "6px 12px",
-                                borderRadius: 8,
-                                border: "1px solid var(--border-color)",
-                                background: "var(--bg-primary)",
-                                color: "var(--text-primary)",
-                                fontSize: 13,
-                                outline: "none",
-                            }}
+                            className="px-3 py-1.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-primary)] text-xs outline-none focus:border-[var(--accent)]"
                         >
                             <option value="growthScore">Growth Score</option>
                             <option value="price">Price</option>
@@ -142,91 +102,55 @@ export default function StocksPage() {
             )}
 
             {/* Stock Cards Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {filtered.map((stock, i) => (
                     <Link
                         href={`/stocks/${stock.id}`}
                         key={stock.id}
-                        style={{ textDecoration: "none" }}
+                        className="no-underline block h-full"
                     >
                         <div
-                            className="card animate-fade-in-up"
-                            style={{ padding: 20, cursor: "pointer", animationDelay: `${i * 0.03}s` }}
+                            className="card p-5 cursor-pointer h-full hover:shadow-lg transition-transform hover:-translate-y-1 animate-fade-in-up flex flex-col justify-between"
+                            style={{ animationDelay: `${i * 0.03}s` }}
                         >
-                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                                    <div
-                                        style={{
-                                            width: 44,
-                                            height: 44,
-                                            borderRadius: 12,
-                                            background: "var(--bg-secondary)",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            fontSize: 22,
-                                        }}
-                                    >
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-11 h-11 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center text-xl flex-shrink-0">
                                         {stock.logo}
                                     </div>
                                     <div>
-                                        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>
+                                        <div className="text-base font-bold text-[var(--text-primary)] leading-tight">
                                             {stock.symbol}
                                         </div>
-                                        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                                        <div className="text-xs text-[var(--text-muted)] line-clamp-1">
                                             {stock.name}
                                         </div>
                                     </div>
                                 </div>
-                                {/* Risk Badge */}
-                                <span
-                                    style={{
-                                        padding: "4px 10px",
-                                        borderRadius: 6,
-                                        fontSize: 11,
-                                        fontWeight: 600,
-                                        background:
-                                            stock.risk === "Low"
-                                                ? "var(--green-bg)"
-                                                : stock.risk === "Medium"
-                                                    ? "var(--yellow-bg)"
-                                                    : "var(--red-bg)",
-                                        color:
-                                            stock.risk === "Low"
-                                                ? "var(--green)"
-                                                : stock.risk === "Medium"
-                                                    ? "var(--yellow)"
-                                                    : "var(--red)",
-                                    }}
-                                >
+                                <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide ${stock.risk === "Low"
+                                    ? "bg-[var(--green-bg)] text-[var(--green)]"
+                                    : stock.risk === "Medium"
+                                        ? "bg-[var(--yellow-bg)] text-[var(--yellow)]"
+                                        : "bg-[var(--red-bg)] text-[var(--red)]"
+                                    }`}>
                                     {stock.risk}
                                 </span>
                             </div>
 
-                            <div style={{ display: "flex", alignItems: "end", justifyContent: "space-between" }}>
+                            <div className="flex items-end justify-between">
                                 <div>
-                                    <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)" }}>
+                                    <div className="text-xl font-extrabold text-[var(--text-primary)]">
                                         {formatCurrency(stock.price)}
                                     </div>
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                            gap: 4,
-                                            fontSize: 13,
-                                            fontWeight: 600,
-                                            color: stock.changePercent >= 0 ? "var(--green)" : "var(--red)",
-                                            marginTop: 4,
-                                        }}
-                                    >
+                                    <div className={`flex items-center gap-1 text-xs font-bold mt-1 ${stock.changePercent >= 0 ? "text-[var(--green)]" : "text-[var(--red)]"
+                                        }`}>
                                         {stock.changePercent >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
                                         {formatPercent(stock.changePercent)}
                                     </div>
                                 </div>
 
-                                {/* Growth Score */}
-                                <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, fontWeight: 600, color: "var(--yellow)" }}>
-                                    <Star size={14} fill="currentColor" />
+                                <div className="flex items-center gap-1 text-xs font-bold text-[var(--yellow)] bg-[var(--yellow-bg)] px-2 py-1 rounded-md">
+                                    <Star size={12} fill="currentColor" />
                                     {stock.growthScore}
                                 </div>
                             </div>
@@ -236,7 +160,7 @@ export default function StocksPage() {
             </div>
 
             {filtered.length === 0 && (
-                <div style={{ textAlign: "center", padding: 48, color: "var(--text-muted)" }}>
+                <div className="text-center py-12 text-[var(--text-muted)]">
                     No stocks found matching your criteria.
                 </div>
             )}
