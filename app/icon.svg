@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Simplified icon for favicon - Stack of Coins with Arrow -->
+  <rect width="48" height="48" fill="#ffffff" rx="8"/>
+  
+  <!-- Stack of Coins -->
+  <g transform="translate(8, 12)">
+    <ellipse cx="16" cy="22" rx="14" ry="6" fill="#6366f1" opacity="0.8"/>
+    <ellipse cx="16" cy="16" rx="14" ry="6" fill="#8b5cf6"/>
+    <ellipse cx="16" cy="10" rx="14" ry="6" fill="#a78bfa"/>
+    
+    <!-- Growth Arrow -->
+    <path d="M28 20 L38 10 M38 10 L32 10 M38 10 L38 16" 
+          stroke="#10b981" 
+          stroke-width="3" 
+          fill="none" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"/>
+  </g>
+</svg>

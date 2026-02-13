@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "StakeWise — Own Smarter, Grow Together",
   description:
     "Own Smarter, Grow Together. A modern fractional investing platform with AI-powered suggestions and beginner-friendly tools.",
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
