@@ -87,7 +87,11 @@ export default function StockDetailPage() {
             });
     };
 
+    // Reset state and fetch on param change
     useEffect(() => {
+        setStock(null);
+        setLoading(true);
+        setShowSuggestion(false);
         fetchStock();
 
         // Refetch on window focus (e.g. returning from deposit)
@@ -98,8 +102,9 @@ export default function StockDetailPage() {
 
     // Show AI suggestion popup after 2 seconds
     useEffect(() => {
+        if (!stock) return;
         const timer = setTimeout(() => {
-            if (stock) setShowSuggestion(true);
+            setShowSuggestion(true);
         }, 2000);
         return () => clearTimeout(timer);
     }, [stock]);
@@ -245,8 +250,8 @@ export default function StockDetailPage() {
 
             {/* AI Suggestion Popup */}
             {showSuggestion && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
-                    <div className="w-full max-w-lg rounded-3xl border border-[var(--border-color)] shadow-2xl animate-fade-in-up overflow-hidden" style={{ background: 'var(--bg-card)' }}>
+                <div className="fixed bottom-4 left-4 right-4 z-50 sm:left-auto sm:w-full sm:max-w-sm animate-fade-in-up">
+                    <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl overflow-hidden relative">
                         {/* Header */}
                         <div className="relative px-6 pt-6 pb-4" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1))' }}>
                             <button
@@ -347,7 +352,7 @@ export default function StockDetailPage() {
                                 }}
                                 className="flex-1 py-3 rounded-xl bg-indigo-500 text-white font-bold text-sm hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/25"
                             >
-                                {aiInsights.action === 'buy' ? 'Trade Now' : 'View Details'}
+                                {aiInsights.action === 'buy' ? 'Trade Now' : 'Trade Now'}
                             </button>
                         </div>
                     </div>
