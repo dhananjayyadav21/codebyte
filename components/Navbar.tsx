@@ -32,7 +32,15 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
     useEffect(() => {
         fetchNotifications();
         const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
-        return () => clearInterval(interval);
+
+        // Listen for custom event to trigger immediate update
+        const handleUpdate = () => fetchNotifications();
+        window.addEventListener("notification-update", handleUpdate);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("notification-update", handleUpdate);
+        };
     }, []);
 
     const markAsRead = async () => {
@@ -115,6 +123,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                                     onClick={() => {
                                         markAsRead();
                                         setUnreadCount(0);
+                                        setShowNotifications(false);
                                     }}
                                     className="text-xs text-indigo-500 hover:text-indigo-600 font-medium"
                                 >

@@ -257,6 +257,9 @@ export default function StockDetailPage() {
             // Refresh data to update balance/shares/inventory
             fetchStock();
 
+            // Trigger notification update immediately
+            window.dispatchEvent(new Event("notification-update"));
+
         } catch (error: any) {
             showToast(error.message, "error");
         } finally {
