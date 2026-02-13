@@ -70,6 +70,27 @@ export default function StockDetailPage() {
     const [isTrading, setIsTrading] = useState(false);
     const [activeTab, setActiveTab] = useState<"BUY" | "SELL">("BUY");
     const [showSuggestion, setShowSuggestion] = useState(false);
+    const [timeRange, setTimeRange] = useState("1Y");
+
+    const getFilteredHistory = () => {
+        if (!stock) return [];
+        if (timeRange === "ALL") return stock.history;
+
+        const now = new Date();
+        const cutoff = new Date();
+
+        switch (timeRange) {
+            case "1M": cutoff.setMonth(now.getMonth() - 1); break;
+            case "3M": cutoff.setMonth(now.getMonth() - 3); break;
+            case "6M": cutoff.setMonth(now.getMonth() - 6); break;
+            case "1Y": cutoff.setFullYear(now.getFullYear() - 1); break;
+            default: return stock.history;
+        }
+
+        return stock.history.filter(item => new Date(item.date) >= cutoff);
+    };
+
+    const filteredHistory = getFilteredHistory();
 
     const fetchStock = () => {
         fetch(`/api/stocks/${params.id}`)
@@ -399,21 +420,28 @@ export default function StockDetailPage() {
 
                     {/* Price Chart Card */}
                     <div className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm">
+
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="font-bold text-[var(--text-primary)]">Price History</h3>
-                            <select className="bg-[var(--bg-secondary)] text-[var(--text-secondary)] text-sm rounded-lg px-3 py-1 border border-[var(--border-color)] outline-none">
-                                <option>3 Months</option>
-                                <option>1 Year</option>
-                                <option>5 Years</option>
+                            <select
+                                value={timeRange}
+                                onChange={(e) => setTimeRange(e.target.value)}
+                                className="bg-[var(--bg-secondary)] text-[var(--text-primary)] text-sm rounded-lg px-3 py-1 border border-[var(--border-color)] outline-none cursor-pointer focus:ring-2 focus:ring-indigo-500/20"
+                            >
+                                <option value="1M">1 Month</option>
+                                <option value="3M">3 Months</option>
+                                <option value="6M">6 Months</option>
+                                <option value="1Y">1 Year</option>
+                                <option value="ALL">All Time</option>
                             </select>
                         </div>
                         <div className="h-[350px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={stock.history}>
+                                <AreaChart data={filteredHistory}>
                                     <defs>
                                         <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                            <stop offset="5%" stopColor={stock.changePercent >= 0 ? "#10b981" : "#ef4444"} stopOpacity={0.3} />
+                                            <stop offset="95%" stopColor={stock.changePercent >= 0 ? "#10b981" : "#ef4444"} stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <XAxis
@@ -451,10 +479,10 @@ export default function StockDetailPage() {
                                     <Area
                                         type="monotone"
                                         dataKey="price"
-                                        stroke="#6366f1"
+                                        stroke={stock.changePercent >= 0 ? "#10b981" : "#ef4444"}
                                         strokeWidth={2}
                                         fill="url(#colorPrice)"
-                                        activeDot={{ r: 6, fill: "#6366f1", stroke: "var(--bg-card)", strokeWidth: 2 }}
+                                        activeDot={{ r: 6, fill: stock.changePercent >= 0 ? "#10b981" : "#ef4444", stroke: "var(--bg-card)", strokeWidth: 2 }}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>

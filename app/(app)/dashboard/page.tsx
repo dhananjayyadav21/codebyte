@@ -185,8 +185,8 @@ export default function DashboardPage() {
                             <AreaChart data={chartData}>
                                 <defs>
                                     <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                        <stop offset="5%" stopColor={data.totalGainLoss >= 0 ? "#10b981" : "#ef4444"} stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor={data.totalGainLoss >= 0 ? "#10b981" : "#ef4444"} stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <Tooltip
@@ -202,7 +202,7 @@ export default function DashboardPage() {
                                 <Area
                                     type="monotone"
                                     dataKey="value"
-                                    stroke="#6366f1"
+                                    stroke={data.totalGainLoss >= 0 ? "#10b981" : "#ef4444"}
                                     strokeWidth={3}
                                     fill="url(#colorValue)"
                                 />
@@ -233,6 +233,17 @@ export default function DashboardPage() {
                             {formatCurrency(data.currentValue)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">{data.portfolio.length} active positions</p>
+                    </div>
+
+                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
+                            {data.totalGainLoss >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                            <span className="text-sm font-medium">Total Profit/Loss</span>
+                        </div>
+                        <div className={`text-3xl font-bold ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                            {data.totalGainLoss >= 0 ? "+" : ""}{formatCurrency(data.totalGainLoss)}
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mt-1">Total investment returns</p>
                     </div>
                 </div>
             </div>
