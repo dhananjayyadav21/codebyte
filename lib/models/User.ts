@@ -53,7 +53,6 @@ const UserSchema = new Schema<IUser>(
     { timestamps: true }
 );
 
-UserSchema.index({ email: 1 });
 UserSchema.index({ verificationToken: 1 });
 UserSchema.index({ resetToken: 1 });
 
