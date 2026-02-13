@@ -232,6 +232,11 @@ body {
   color: white;
 }
 
+.toast-info {
+  background: #3b82f6;
+  color: white;
+}
+
 /* ========= Spinner ========= */
 @keyframes spin {
   from {

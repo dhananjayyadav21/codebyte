@@ -5,11 +5,11 @@ import { createContext, useContext, useState, useCallback } from "react";
 interface Toast {
     id: string;
     message: string;
-    type: "success" | "error";
+    type: "success" | "error" | "info";
 }
 
 interface ToastContextType {
-    showToast: (message: string, type?: "success" | "error") => void;
+    showToast: (message: string, type?: "success" | "error" | "info") => void;
 }
 
 const ToastContext = createContext<ToastContextType>({ showToast: () => { } });
@@ -21,7 +21,7 @@ export function useToast() {
 export function ToastProvider({ children }: { children: React.ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([]);
 
-    const showToast = useCallback((message: string, type: "success" | "error" = "success") => {
+    const showToast = useCallback((message: string, type: "success" | "error" | "info" = "success") => {
         const id = Math.random().toString(36).slice(2);
         setToasts((prev) => [...prev, { id, message, type }]);
         setTimeout(() => {

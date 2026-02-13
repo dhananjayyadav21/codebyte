@@ -6,6 +6,7 @@ import Link from "next/link";
 import { lessons } from "@/lib/mock-data";
 import { ArrowLeft, Clock, BarChart2, BookOpen, Share2 } from "lucide-react";
 import { marked } from "marked";
+import AILessonAssistant from "@/components/AILessonAssistant";
 
 export default function LessonPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
@@ -112,6 +113,11 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
                         dangerouslySetInnerHTML={{ __html: marked(lesson.content || "") }}
                     />
                 </article>
+
+                {/* AI Assistant Section */}
+                <div className="mt-10">
+                    <AILessonAssistant lesson={lesson} />
+                </div>
 
                 <div className="mt-12 pt-8 border-t border-[var(--border-color)] flex justify-between items-center">
                     <p className="text-sm text-[var(--text-muted)] italic">
