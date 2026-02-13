@@ -1,19 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
-  <!-- Simplified icon for favicon - Stack of Coins with Arrow -->
-  <rect width="48" height="48" fill="#ffffff" rx="8"/>
+  <!-- Background -->
+  <rect width="48" height="48" fill="#f5f5f5" rx="8"/>
   
-  <!-- Stack of Coins -->
-  <g transform="translate(8, 12)">
-    <ellipse cx="16" cy="22" rx="14" ry="6" fill="#6366f1" opacity="0.8"/>
-    <ellipse cx="16" cy="16" rx="14" ry="6" fill="#8b5cf6"/>
-    <ellipse cx="16" cy="10" rx="14" ry="6" fill="#a78bfa"/>
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="favicon_grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Stack of Coins Icon -->
+  <g transform="translate(6, 10)">
+    <!-- Coin 1 (Bottom) -->
+    <ellipse cx="16" cy="24" rx="13" ry="6" fill="url(#favicon_grad)" opacity="0.7"/>
+    <path d="M 3 24 Q 3 20 16 18 Q 29 20 29 24" fill="#6366f1" opacity="0.5"/>
+    
+    <!-- Coin 2 (Middle) -->
+    <ellipse cx="16" cy="16" rx="13" ry="6" fill="url(#favicon_grad)"/>
+    <path d="M 3 16 Q 3 12 16 10 Q 29 12 29 16" fill="#7c3aed" opacity="0.4"/>
+    
+    <!-- Coin 3 (Top) -->
+    <ellipse cx="16" cy="8" rx="13" ry="6" fill="#a78bfa"/>
+    <path d="M 3 8 Q 3 4 16 2 Q 29 4 29 8" fill="#c4b5fd" opacity="0.4"/>
     
     <!-- Growth Arrow -->
-    <path d="M28 20 L38 10 M38 10 L32 10 M38 10 L38 16" 
-          stroke="#10b981" 
-          stroke-width="3" 
-          fill="none" 
-          stroke-linecap="round" 
-          stroke-linejoin="round"/>
+    <g transform="translate(22, 6)">
+      <path d="M 0 10 L 8 2 M 8 2 L 3 2 M 8 2 L 8 7" 
+            stroke="#10b981" 
+            stroke-width="2.5" 
+            fill="none" 
+            stroke-linecap="round" 
+            stroke-linejoin="round"/>
+    </g>
   </g>
 </svg>
