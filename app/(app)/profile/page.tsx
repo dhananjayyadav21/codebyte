@@ -160,7 +160,7 @@ export default function ProfilePage() {
                     <h1 className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">My Profile</h1>
                     <p className="text-sm text-[var(--text-secondary)]">Manage your account settings and security</p>
                 </div>
-                <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--red)] text-sm font-semibold hover:bg-[var(--red-bg)] transition-colors">
+                <button onClick={handleLogout} className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-semibold hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors">
                     <LogOut size={16} /> Logout
                 </button>
             </div>
@@ -186,7 +186,7 @@ export default function ProfilePage() {
                         </div>
 
                         {!editing && (
-                            <button onClick={() => setEditing(true)} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--accent)] text-sm font-semibold hover:bg-[var(--bg-secondary)] transition-colors">
+                            <button onClick={() => setEditing(true)} className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
                                 <Edit3 size={16} /> Edit Profile
                             </button>
                         )}
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                             <button
                                 key={t.key}
                                 onClick={() => setTab(t.key)}
-                                className={`flex-1 py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold transition-all ${tab === t.key ? "bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm" : "bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                                className={`flex-1 py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 text-sm font-semibold transition-all ${tab === t.key ? "bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700" : "bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
                                     }`}
                             >
                                 <t.icon size={16} /> {t.label}
@@ -249,10 +249,10 @@ export default function ProfilePage() {
 
                                 {editing && (
                                     <div className="flex gap-3 mt-6">
-                                        <button onClick={handleSaveProfile} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                        <button onClick={handleSaveProfile} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md hover:shadow-lg transition-all">
                                             <Save size={16} /> Save Changes
                                         </button>
-                                        <button onClick={() => setEditing(false)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] font-semibold hover:bg-[var(--bg-secondary)] transition-colors">
+                                        <button onClick={() => setEditing(false)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                                             <X size={16} /> Cancel
                                         </button>
                                     </div>
@@ -286,7 +286,7 @@ export default function ProfilePage() {
                                 <p className="text-sm text-[var(--text-secondary)] mb-5">Update your password regularly for better security.</p>
 
                                 {!changingPassword ? (
-                                    <button onClick={() => setChangingPassword(true)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold shadow-md hover:shadow-lg transition-all">
+                                    <button onClick={() => setChangingPassword(true)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl border-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md hover:shadow-lg transition-all">
                                         <Lock size={16} /> Change Password
                                     </button>
                                 ) : (
@@ -301,8 +301,8 @@ export default function ProfilePage() {
                                         <input type="password" placeholder="New password" value={pwForm.newPassword} onChange={(e) => setPwForm({ ...pwForm, newPassword: e.target.value })} style={inputStyle} />
                                         <input type="password" placeholder="Confirm new password" value={pwForm.confirmPassword} onChange={(e) => setPwForm({ ...pwForm, confirmPassword: e.target.value })} style={inputStyle} />
                                         <div className="flex gap-3 mt-2">
-                                            <button onClick={handleChangePassword} className="px-6 py-2.5 rounded-xl border-none bg-[var(--gradient-card)] text-white font-semibold hover:shadow-lg transition-all">Save</button>
-                                            <button onClick={() => { setChangingPassword(false); setPwError(""); }} className="px-6 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-primary)] text-[var(--text-secondary)] font-semibold hover:bg-[var(--bg-secondary)]">Cancel</button>
+                                            <button onClick={handleChangePassword} className="px-6 py-2.5 rounded-xl border-none bg-indigo-600 hover:bg-indigo-700 text-white font-semibold hover:shadow-lg transition-all">Save</button>
+                                            <button onClick={() => { setChangingPassword(false); setPwError(""); }} className="px-6 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700">Cancel</button>
                                         </div>
                                     </div>
                                 )}

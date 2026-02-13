@@ -119,7 +119,7 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
                     </p>
                     <Link
                         href="/learn"
-                        className="px-6 py-3 rounded-xl bg-[var(--gradient-card)] text-white font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2"
+                        className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-2"
                     >
                         <BookOpen size={18} /> Complete & Return
                     </Link>

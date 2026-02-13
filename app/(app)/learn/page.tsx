@@ -86,7 +86,7 @@ export default function LearnPage() {
                                         </p>
                                         <Link
                                             href={`/learn/${lesson.id}`}
-                                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--gradient-card)] text-white text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 no-underline"
+                                            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 no-underline"
                                         >
                                             <BookOpen size={16} /> Start Lesson
                                         </Link>
