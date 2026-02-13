@@ -72,6 +72,7 @@ export default function StockDetailPage() {
     const [isTrading, setIsTrading] = useState(false);
     const [activeTab, setActiveTab] = useState<"BUY" | "SELL">("BUY");
     const [showSuggestion, setShowSuggestion] = useState(false);
+    const [aiTab, setAiTab] = useState<"overview" | "technical" | "risk" | "strategy">("overview");
     const [timeRange, setTimeRange] = useState("1Y");
 
     const getFilteredHistory = () => {
@@ -160,7 +161,7 @@ export default function StockDetailPage() {
                 : `✅ ${s.symbol} remains a Strong Buy. Dollar-cost averaging into this position could maximize long-term returns.`;
             action = "buy";
         } else if (s.aiRecommendation === "Buy") {
-            suggestion = `📈 ${s.symbol} is rated Buy. Consider adding a moderate position and set a stop-loss near ${(s.price * 0.92).toFixed(2)} for risk management.`;
+            suggestion = `📈 ${s.symbol} is rated Buy. Consider adding a moderate position and set a stop-loss near ${formatPrice(s.price * 0.92)} for risk management.`;
             action = "buy";
         } else if (s.aiRecommendation === "Hold") {
             suggestion = `⏸️ ${s.symbol} is at Hold. If you already own shares, maintain your position. Wait for a clearer trend before adding more.`;
@@ -170,7 +171,49 @@ export default function StockDetailPage() {
             action = "caution";
         }
 
-        return { pastAnalysis, futureOutlook, suggestion, action, pricePosition, isNearHigh, isNearLow };
+        // Technical Analysis
+        const momentum = s.changePercent > 2 ? "Strong Bullish" : s.changePercent > 0 ? "Bullish" : s.changePercent > -2 ? "Bearish" : "Strong Bearish";
+        const support = s.price * 0.95;
+        const resistance = s.price * 1.05;
+        const volumeTrend = s.volume > 1000000 ? "Above Average - High Interest" : "Normal - Steady Activity";
+
+        const technicalAnalysis = `${s.symbol} is showing ${momentum} momentum. Current price action suggests support near ${formatPrice(support)} and resistance at ${formatPrice(resistance)}. Volume trends indicate ${volumeTrend.toLowerCase()}.`;
+
+        // Risk Assessment
+        const beta = 1 + (s.risk === "High" ? 0.5 : s.risk === "Low" ? -0.3 : 0);
+        const volatility = s.risk === "High" ? "High (>25% annualized)" : s.risk === "Low" ? "Low (<15% annualized)" : "Moderate (15-25%)";
+        const maxDrawdown = s.risk === "High" ? "30-40%" : s.risk === "Low" ? "10-15%" : "15-25%";
+        const riskReward = action === "buy" ? "Favorable (1:3+)" : action === "caution" ? "Unfavorable (1:1)" : "Neutral (1:2)";
+
+        const riskAnalysis = `${s.symbol} has a beta of ${beta.toFixed(2)}, indicating ${beta > 1.2 ? "higher" : beta < 0.8 ? "lower" : "similar"} volatility vs market. Historical max drawdown: ${maxDrawdown}. Current risk-reward ratio: ${riskReward}.`;
+
+        // Sector Comparison
+        const sectorPerf = s.changePercent > 1 ? "outperforming" : s.changePercent < -1 ? "underperforming" : "in-line with";
+        const ranking = s.growthScore > 70 ? "Top 25%" : s.growthScore > 50 ? "Top 50%" : "Bottom 50%";
+
+        const sectorComparison = `${s.symbol} is ${sectorPerf} its ${s.sector} sector peers. Ranks in ${ranking} of sector by growth metrics. Market share trends ${s.growthScore > 60 ? "expanding" : "stable"}.`;
+
+        // Trading Strategy
+        const entryPoint = isNearLow ? `Excellent entry near 52W low (${pricePosition.toFixed(0)}% of range)` : isNearHigh ? `Wait for pullback from 52W high` : `Current levels acceptable for gradual accumulation`;
+        const stopLoss = s.price * 0.92;
+        const target = s.price * (1 + (s.growthScore / 100) * 0.5);
+        const positionSize = s.risk === "High" ? "2-5% of portfolio" : s.risk === "Low" ? "10-15% of portfolio" : "5-10% of portfolio";
+
+        const tradingStrategy = `Entry: ${entryPoint}. Set stop-loss at ${formatPrice(stopLoss)} (-8%). Target price: ${formatPrice(target)} (+${((target / s.price - 1) * 100).toFixed(1)}%). Recommended position: ${positionSize}.`;
+
+        return {
+            pastAnalysis,
+            futureOutlook,
+            suggestion,
+            action,
+            pricePosition,
+            isNearHigh,
+            isNearLow,
+            technical: { momentum, support, resistance, volumeTrend, analysis: technicalAnalysis },
+            risk: { volatility, beta, maxDrawdown, riskReward, analysis: riskAnalysis },
+            sector: { comparison: sectorComparison, ranking },
+            strategy: { entryPoint, stopLoss, target, positionSize, analysis: tradingStrategy }
+        };
     };
 
     if (loading) {
