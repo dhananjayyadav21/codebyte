@@ -15,6 +15,8 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
     const { theme, toggleTheme } = useTheme();
     const { currency, setCurrency } = useCurrency();
     const [notifications, setNotifications] = useState<any[]>([]);
+    const [userInitial, setUserInitial] = useState<string>("U");
+    const [userName, setUserName] = useState<string>("");
 
     const toggleCurrency = () => {
         setCurrency(currency === "INR" ? "USD" : "INR");
@@ -35,8 +37,23 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         }
     };
 
+    const fetchUserData = async () => {
+        try {
+            const res = await fetch("/api/auth/me");
+            const data = await res.json();
+            if (data.user && data.user.fullName) {
+                const initial = data.user.fullName.charAt(0).toUpperCase();
+                setUserInitial(initial);
+                setUserName(data.user.fullName);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user data", error);
+        }
+    };
+
     useEffect(() => {
         fetchNotifications();
+        fetchUserData();
         const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
 
         // Listen for custom event to trigger immediate update
@@ -189,23 +206,39 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                     {currency === "INR" ? "₹" : "$"}
                 </button>
 
-                <div
-                    style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: "50%",
-                        background: "var(--gradient-card)",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: "white",
-                        marginLeft: 4,
-                    }}
+                {/* User Profile Icon */}
+                <Link
+                    href="/profile"
+                    className="group relative"
+                    title={userName || "User Profile"}
                 >
-                    DK
-                </div>
+                    <div
+                        style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: "50%",
+                            background: "var(--gradient-card)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: "white",
+                            marginLeft: 4,
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                        }}
+                        className="hover:shadow-lg hover:shadow-indigo-500/50"
+                    >
+                        {userInitial}
+                    </div>
+                    {/* Tooltip */}
+                    {userName && (
+                        <div className="absolute bottom-full right-0 mb-2 px-3 py-1.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg text-xs font-medium text-[var(--text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                            {userName}
+                        </div>
+                    )}
+                </Link>
             </div>
         </header >
     );

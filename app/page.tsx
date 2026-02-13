@@ -412,13 +412,126 @@ export default function LandingPage() {
             </div>
 
             <div className="relative">
-              {/* Abstract UI Mockup */}
-              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-2">
-                <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
-                  <span className="text-[var(--text-muted)] font-medium text-sm">Platform Interactive Demo</span>
+              {/* Generic Investment Platform Mockup */}
+              <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border border-[var(--border-color)] bg-gradient-to-br from-slate-900 to-slate-800 min-h-[400px] flex flex-col">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 px-6 py-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                      <TrendingUp className="text-white" size={20} />
+                    </div>
+                    <div>
+                      <h3 className="text-white font-bold">Investment Dashboard</h3>
+                      <p className="text-indigo-100 text-xs">Real-time Analytics</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-white text-2xl font-bold">$524.8K</div>
+                    <div className="text-emerald-300 text-xs font-semibold">↑ 24.8%</div>
+                  </div>
+                </div>
+
+                {/* Content Grid */}
+                <div className="flex-1 p-6 grid md:grid-cols-2 gap-4">
+                  {/* Left Column - Charts */}
+                  <div className="space-y-4">
+                    {/* Small Stats */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <div className="text-xs text-indigo-300 mb-1">Stocks Owned</div>
+                        <div className="text-xl font-bold text-white">1,247</div>
+                      </div>
+                      <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                        <div className="text-xs text-purple-300 mb-1">Dividends</div>
+                        <div className="text-xl font-bold text-white">$2.4K</div>
+                      </div>
+                    </div>
+
+                    {/* Bar Chart Placeholder */}
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                      <div className="text-xs font-semibold text-white mb-3">Performance</div>
+                      <div className="flex items-end justify-between h-20 gap-1.5">
+                        {[40, 55, 65, 48, 72, 68, 85, 90].map((height, idx) => (
+                          <div
+                            key={idx}
+                            className="flex-1 bg-gradient-to-t from-indigo-500 to-indigo-300 rounded-full opacity-70 hover:opacity-100 transition-opacity"
+                            style={{
+                              height: `${(height / 100) * 100}%`,
+                              minHeight: "4px",
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column - Pie Chart & Info */}
+                  <div className="space-y-4">
+                    {/* Circular Progress Visualization */}
+                    <div className="flex items-center justify-center">
+                      <div className="relative w-32 h-32">
+                        <svg viewBox="0 0 120 120" className="w-full h-full">
+                          <circle cx="60" cy="60" r="55" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="10" />
+                          <circle cx="60" cy="60" r="55" fill="none" stroke="url(#grad)" strokeWidth="10" strokeDasharray="154 220" strokeLinecap="round" transform="rotate(-90 60 60)" />
+                          <defs>
+                            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#818cf8" />
+                              <stop offset="100%" stopColor="#ec4899" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="text-xl font-bold text-white">70%</div>
+                            <div className="text-xs text-indigo-300">Allocated</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Portfolio Mix */}
+                    <div className="bg-white/5 rounded-lg p-3 border border-white/10 space-y-2">
+                      <div className="text-xs font-semibold text-white">Portfolio Mix</div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-300">Tech Stocks</span>
+                          <span className="font-semibold text-indigo-300">45%</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-[45%] bg-indigo-500" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-300">ETFs</span>
+                          <span className="font-semibold text-purple-300">35%</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-[35%] bg-purple-500" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-300">Cash</span>
+                          <span className="font-semibold text-pink-300">20%</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full w-[20%] bg-pink-500" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Action */}
+                <div className="border-t border-white/10 px-6 py-3 bg-white/5">
+                  <Link href="/stocks" className="w-full py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm hover:shadow-lg hover:shadow-indigo-500/50 transition-all inline-block text-center">
+                    Start Your Investment Journey
+                  </Link>
                 </div>
               </div>
-              {/* Decorative Blob */}
+
+              {/* Decorative Blobs */}
               <div className="absolute -top-10 -right-10 w-56 h-56 bg-indigo-500/20 rounded-full blur-3xl -z-10" />
               <div className="absolute -bottom-10 -left-10 w-56 h-56 bg-purple-500/20 rounded-full blur-3xl -z-10" />
             </div>
