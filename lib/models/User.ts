@@ -1,5 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+// Force HMR refresh
+
 export interface IUser extends Document {
     fullName: string;
     email: string;
@@ -55,4 +57,5 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ verificationToken: 1 });
 UserSchema.index({ resetToken: 1 });
 
-export default mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+// Export AppUser model to fix caching issue (maps to 'users' collection)
+export default mongoose.models.AppUser || mongoose.model<IUser>("AppUser", UserSchema, "users");

@@ -21,12 +21,16 @@ export async function POST(request: Request) {
         await connectDB();
 
         if (type === "DEPOSIT") {
+            console.log(`[Wallet] Processing deposit for user ${user._id}: $${amount}`);
+
             // 1. Update User Balance
             const updatedUser = await User.findByIdAndUpdate(
                 user._id,
                 { $inc: { balance: amount } },
                 { new: true }
             );
+
+            console.log(`[Wallet] Updated user balance: ${updatedUser?.balance}`);
 
             // 2. Log Transaction
             await Transaction.create({

@@ -89,6 +89,11 @@ export default function StockDetailPage() {
 
     useEffect(() => {
         fetchStock();
+
+        // Refetch on window focus (e.g. returning from deposit)
+        const onFocus = () => fetchStock();
+        window.addEventListener("focus", onFocus);
+        return () => window.removeEventListener("focus", onFocus);
     }, [params.id]);
 
     // Show AI suggestion popup after 2 seconds

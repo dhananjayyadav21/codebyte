@@ -81,16 +81,27 @@ export default function StocksPage() {
                 setLoading(false);
             });
 
-        // Fetch user role + balance
-        fetch("/api/auth/me")
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.user) {
-                    setIsAdmin(data.user.role === "admin");
-                    setUserBalance(data.user.balance || 0);
-                }
-            })
-            .catch(() => { });
+        // Function to fetch user data
+        const fetchUserData = () => {
+            fetch("/api/auth/me")
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.user) {
+                        setIsAdmin(data.user.role === "admin");
+                        setUserBalance(data.user.balance || 0);
+                    }
+                })
+                .catch(() => { });
+        };
+
+        // Initial fetch
+        fetchUserData();
+
+        // Refetch on window focus (e.g. returning from deposit page)
+        const onFocus = () => fetchUserData();
+        window.addEventListener("focus", onFocus);
+
+        return () => window.removeEventListener("focus", onFocus);
     }, []);
 
     const activeFilterCount = [selectedSector, selectedRisk, selectedRec].filter(f => f !== "All").length + (sortBy !== "default" ? 1 : 0);
@@ -340,24 +351,19 @@ export default function StocksPage() {
                         </Link>
 
                         {/* Footer with AI badge + action button */}
-                        <div className="mt-4 pt-4 border-t border-[var(--border-color)] flex items-center justify-between">
-                            <span className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ${stock.aiRecommendation === 'Strong Buy' ? 'bg-emerald-500/10 text-emerald-500'
-                                : stock.aiRecommendation === 'Buy' ? 'bg-cyan-500/10 text-cyan-500'
-                                    : stock.aiRecommendation === 'Hold' ? 'bg-yellow-500/10 text-yellow-500'
-                                        : 'bg-red-500/10 text-red-500'}`}>
-                                {stock.aiRecommendation}
-                            </span>
+                        <div className="mt-4 pt-4 border-t border-[var(--border-color)] space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-[var(--text-muted)]">Cap: {formatCompact(stock.marketCap)}</span>
+                                <span className={`px-2 py-0.5 rounded-md text-[10px] uppercase font-bold tracking-wider ${stock.aiRecommendation === 'Strong Buy' ? 'bg-emerald-500/10 text-emerald-500'
+                                    : stock.aiRecommendation === 'Buy' ? 'bg-cyan-500/10 text-cyan-500'
+                                        : stock.aiRecommendation === 'Hold' ? 'bg-yellow-500/10 text-yellow-500'
+                                            : 'bg-red-500/10 text-red-500'}`}>
+                                    {stock.aiRecommendation}
+                                </span>
+                            </div>
 
-                            {/* Role-based action button */}
-                            {isAdmin ? (
-                                <Link
-                                    href="/admin/stocks/new"
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-500/10 text-indigo-500 text-xs font-bold hover:bg-indigo-500 hover:text-white transition-all"
-                                    onClick={(e) => e.stopPropagation()}
-                                >
-                                    <Plus size={12} /> Add Full Stock
-                                </Link>
-                            ) : (
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
                                 <button
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -366,11 +372,20 @@ export default function StocksPage() {
                                         setBuyAmount("");
                                         setBuySuccess(false);
                                     }}
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all"
+                                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-emerald-500 text-white text-xs font-bold hover:bg-emerald-600 transition-all shadow-sm"
                                 >
-                                    <ShoppingCart size={12} /> Buy Shares
+                                    <ShoppingCart size={14} /> Buy Shares
                                 </button>
-                            )}
+                                {isAdmin && (
+                                    <Link
+                                        href="/admin/stocks/new"
+                                        className="flex items-center justify-center gap-1 px-3 py-2.5 rounded-xl bg-indigo-500/10 text-indigo-500 text-xs font-bold hover:bg-indigo-500 hover:text-white transition-all"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Plus size={14} />
+                                    </Link>
+                                )}
+                            </div>
                         </div>
                     </div>
                 ))}
