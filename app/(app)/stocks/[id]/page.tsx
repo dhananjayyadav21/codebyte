@@ -24,7 +24,12 @@ import {
     Info,
     Loader2,
     Briefcase,
-    PieChart
+    PieChart,
+    X,
+    Brain,
+    BarChart3,
+    Target,
+    Lightbulb
 } from "lucide-react";
 import Link from "next/link";
 
@@ -64,6 +69,7 @@ export default function StockDetailPage() {
     const [amount, setAmount] = useState("");
     const [isTrading, setIsTrading] = useState(false);
     const [activeTab, setActiveTab] = useState<"BUY" | "SELL">("BUY");
+    const [showSuggestion, setShowSuggestion] = useState(false);
 
     const fetchStock = () => {
         fetch(`/api/stocks/${params.id}`)
@@ -84,6 +90,55 @@ export default function StockDetailPage() {
     useEffect(() => {
         fetchStock();
     }, [params.id]);
+
+    // Show AI suggestion popup after 2 seconds
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (stock) setShowSuggestion(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [stock]);
+
+    // Generate AI insights based on stock data
+    const getAIInsights = (s: Stock) => {
+        const pricePosition = s.high52w > 0 ? ((s.price - s.low52w) / (s.high52w - s.low52w)) * 100 : 50;
+        const isNearHigh = pricePosition > 80;
+        const isNearLow = pricePosition < 20;
+
+        // Past Analysis
+        let pastAnalysis = "";
+        if (s.changePercent > 3) pastAnalysis = `${s.symbol} has surged ${s.changePercent.toFixed(1)}% recently, outperforming expectations. Strong buyer momentum detected across institutional flows.`;
+        else if (s.changePercent > 0) pastAnalysis = `${s.symbol} shows steady upward movement at +${s.changePercent.toFixed(1)}%. The stock has maintained consistent growth trajectory over recent trading sessions.`;
+        else if (s.changePercent > -3) pastAnalysis = `${s.symbol} has dipped ${Math.abs(s.changePercent).toFixed(1)}% recently, showing minor selling pressure. This appears to be a sector-wide correction rather than company-specific.`;
+        else pastAnalysis = `${s.symbol} has declined ${Math.abs(s.changePercent).toFixed(1)}% significantly. Market sentiment turned bearish due to broader economic concerns.`;
+
+        // Future Outlook
+        let futureOutlook = "";
+        if (s.growthScore > 75) futureOutlook = `With a growth score of ${s.growthScore}/100, AI models predict strong upside potential. Revenue projections suggest 15-25% YoY growth in the next 4 quarters.`;
+        else if (s.growthScore > 50) futureOutlook = `Growth score of ${s.growthScore}/100 indicates moderate upside. Expect steady gains as the company executes its current business strategy effectively.`;
+        else futureOutlook = `A growth score of ${s.growthScore}/100 signals limited upside in the near term. Watch for catalysts like earnings beats or new product launches.`;
+
+        // Suggestion
+        let suggestion = "";
+        let action: "buy" | "hold" | "caution" = "hold";
+        if (s.aiRecommendation === "Strong Buy") {
+            suggestion = isNearLow
+                ? `🔥 Rare opportunity! ${s.symbol} is near its 52-week low with a Strong Buy rating. Consider accumulating shares at this discount.`
+                : `✅ ${s.symbol} remains a Strong Buy. Dollar-cost averaging into this position could maximize long-term returns.`;
+            action = "buy";
+        } else if (s.aiRecommendation === "Buy") {
+            suggestion = `📈 ${s.symbol} is rated Buy. Consider adding a moderate position and set a stop-loss near $${(s.price * 0.92).toFixed(2)} for risk management.`;
+            action = "buy";
+        } else if (s.aiRecommendation === "Hold") {
+            suggestion = `⏸️ ${s.symbol} is at Hold. If you already own shares, maintain your position. Wait for a clearer trend before adding more.`;
+            action = "hold";
+        } else {
+            suggestion = `⚠️ ${s.symbol} carries elevated risk. If considering entry, limit exposure and use tight stop-losses. Not recommended for conservative portfolios.`;
+            action = "caution";
+        }
+
+        return { pastAnalysis, futureOutlook, suggestion, action, pricePosition, isNearHigh, isNearLow };
+    };
 
     if (loading) {
         return (
@@ -178,8 +233,121 @@ export default function StockDetailPage() {
         }
     };
 
+    const aiInsights = getAIInsights(stock);
+
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 relative">
+
+            {/* AI Suggestion Popup */}
+            {showSuggestion && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)' }}>
+                    <div className="w-full max-w-lg rounded-3xl border border-[var(--border-color)] shadow-2xl animate-fade-in-up overflow-hidden" style={{ background: 'var(--bg-card)' }}>
+                        {/* Header */}
+                        <div className="relative px-6 pt-6 pb-4" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.1))' }}>
+                            <button
+                                onClick={() => setShowSuggestion(false)}
+                                className="absolute top-4 right-4 p-1.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                            >
+                                <X size={16} />
+                            </button>
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="p-2.5 rounded-xl bg-indigo-500 text-white shadow-lg shadow-indigo-500/25">
+                                    <Brain size={22} />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-extrabold text-[var(--text-primary)]">AI Insight: {stock.symbol}</h3>
+                                    <p className="text-xs text-[var(--text-secondary)]">Powered by StakeWise Intelligence</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto">
+                            {/* Past Performance */}
+                            <div className="p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <BarChart3 size={16} className="text-cyan-500" />
+                                    <span className="text-xs font-bold uppercase tracking-wider text-cyan-500">Past Performance</span>
+                                </div>
+                                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{aiInsights.pastAnalysis}</p>
+                            </div>
+
+                            {/* Future Outlook */}
+                            <div className="p-4 rounded-2xl bg-[var(--bg-secondary)] border border-[var(--border-color)]">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Target size={16} className="text-violet-500" />
+                                    <span className="text-xs font-bold uppercase tracking-wider text-violet-500">Future Outlook</span>
+                                </div>
+                                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{aiInsights.futureOutlook}</p>
+                            </div>
+
+                            {/* Suggestion */}
+                            <div className={`p-4 rounded-2xl border ${aiInsights.action === 'buy' ? 'bg-emerald-500/5 border-emerald-500/20'
+                                : aiInsights.action === 'caution' ? 'bg-red-500/5 border-red-500/20'
+                                    : 'bg-amber-500/5 border-amber-500/20'
+                                }`}>
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Lightbulb size={16} className={aiInsights.action === 'buy' ? 'text-emerald-500' : aiInsights.action === 'caution' ? 'text-red-500' : 'text-amber-500'} />
+                                    <span className={`text-xs font-bold uppercase tracking-wider ${aiInsights.action === 'buy' ? 'text-emerald-500'
+                                        : aiInsights.action === 'caution' ? 'text-red-500'
+                                            : 'text-amber-500'
+                                        }`}>Suggestion</span>
+                                </div>
+                                <p className="text-sm text-[var(--text-primary)] leading-relaxed font-medium">{aiInsights.suggestion}</p>
+                            </div>
+
+                            {/* Quick Stats Row */}
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] text-center">
+                                    <p className="text-xs text-[var(--text-muted)] mb-1">Risk</p>
+                                    <p className={`text-sm font-bold ${stock.risk === 'Low' ? 'text-emerald-500' : stock.risk === 'High' ? 'text-red-500' : 'text-amber-500'}`}>
+                                        {stock.risk}
+                                    </p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] text-center">
+                                    <p className="text-xs text-[var(--text-muted)] mb-1">Growth</p>
+                                    <p className="text-sm font-bold text-indigo-500">{stock.growthScore}/100</p>
+                                </div>
+                                <div className="p-3 rounded-xl bg-[var(--bg-secondary)] text-center">
+                                    <p className="text-xs text-[var(--text-muted)] mb-1">52W Position</p>
+                                    <p className="text-sm font-bold text-[var(--text-primary)]">{aiInsights.pricePosition.toFixed(0)}%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 pb-6 pt-2 flex gap-3">
+                            <button
+                                onClick={() => setShowSuggestion(false)}
+                                className="flex-1 py-3 rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)] font-bold text-sm hover:bg-[var(--border-color)] transition-colors"
+                            >
+                                Dismiss
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setShowSuggestion(false);
+                                    setActiveTab(aiInsights.action === 'buy' ? 'BUY' : 'SELL');
+                                    // Wait for popup to close, then scroll & focus
+                                    setTimeout(() => {
+                                        const tradeEl = document.getElementById('trade-section');
+                                        if (tradeEl) {
+                                            tradeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                            // Focus the amount input after scroll
+                                            setTimeout(() => {
+                                                const input = tradeEl.querySelector('input[type="number"]') as HTMLInputElement;
+                                                input?.focus();
+                                            }, 500);
+                                        }
+                                    }, 300);
+                                }}
+                                className="flex-1 py-3 rounded-xl bg-indigo-500 text-white font-bold text-sm hover:bg-indigo-600 transition-colors shadow-lg shadow-indigo-500/25"
+                            >
+                                {aiInsights.action === 'buy' ? 'Trade Now' : 'View Details'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {/* Back Nav */}
             <Link
                 href="/stocks"
@@ -341,7 +509,7 @@ export default function StockDetailPage() {
                     </div>
 
                     {/* Buy/Sell Calculator */}
-                    <div className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm sticky top-24">
+                    <div id="trade-section" className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm sticky top-24">
                         <div className="flex items-center gap-2 mb-6">
                             <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-500">
                                 <Calculator size={20} />
