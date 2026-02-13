@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Check, XCircle, Loader2 } from "lucide-react";
@@ -11,6 +11,7 @@ function VerifyEmailContent() {
     const token = searchParams.get("token");
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("");
+    const hasFetched = useRef(false);
 
     useEffect(() => {
         if (!token) {
@@ -18,6 +19,9 @@ function VerifyEmailContent() {
             setMessage("Missing verification token");
             return;
         }
+
+        if (hasFetched.current) return;
+        hasFetched.current = true;
 
         fetch(`/api/auth/verify-email?token=${token}`)
             .then((res) => res.json().then((data) => ({ ok: res.ok, data })))
