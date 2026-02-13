@@ -11,9 +11,19 @@ import {
     ArrowUpRight,
     ArrowDownLeft,
     Briefcase,
-    Plus
+    Plus,
+    Wallet
 } from "lucide-react";
 import Link from "next/link";
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer
+} from "recharts";
 
 interface PortfolioItem {
     stockId: string;
@@ -30,9 +40,9 @@ interface PortfolioItem {
 interface Transaction {
     _id: string;
     symbol: string;
-    type: "BUY" | "SELL";
-    shares: number;
-    price: number;
+    type: "BUY" | "SELL" | "DEPOSIT" | "WITHDRAW";
+    shares?: number;
+    price?: number;
     totalAmount: number;
     date: string;
 }
@@ -45,6 +55,29 @@ interface DashboardData {
     portfolio: PortfolioItem[];
     recentActivity: Transaction[];
 }
+
+// Generate some mock chart data based on current value for visual appeal
+// In a real app, this would come from historical snapshots
+const generateChartData = (currentValue: number, balance: number) => {
+    const data = [];
+    const total = currentValue + balance;
+    let val = total * 0.9; // Start 10% lower
+    const points = 7;
+
+    for (let i = 0; i < points; i++) {
+        val = val * (1 + (Math.random() * 0.05 - 0.01)); // Random daily movement
+        if (i === points - 1) val = total; // End at current
+
+        const d = new Date();
+        d.setDate(d.getDate() - (points - 1 - i));
+
+        data.push({
+            date: d.toLocaleDateString('en-US', { weekday: 'short' }),
+            value: val
+        });
+    }
+    return data;
+};
 
 export default function DashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
@@ -65,16 +98,51 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="p-8 flex justify-center text-[var(--text-muted)]">
-                Loading dashboard...
+            <div className="min-h-screen flex items-center justify-center text-[var(--text-muted)]">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p>Loading your portfolio...</p>
+                </div>
             </div>
         );
     }
 
     if (!data) return null;
 
+    const chartData = generateChartData(data.currentValue, data.balance);
+
+    const getTransactionIcon = (type: string) => {
+        switch (type) {
+            case "DEPOSIT": return <Wallet size={16} />;
+            case "WITHDRAW": return <ArrowUpRight size={16} />;
+            case "BUY": return <ArrowDownLeft size={16} />;
+            case "SELL": return <ArrowUpRight size={16} />;
+            default: return <Activity size={16} />;
+        }
+    };
+
+    const getTransactionColor = (type: string) => {
+        switch (type) {
+            case "DEPOSIT": return "bg-indigo-500/10 text-indigo-500";
+            case "WITHDRAW": return "bg-red-500/10 text-red-500";
+            case "BUY": return "bg-emerald-500/10 text-emerald-500";
+            case "SELL": return "bg-amber-500/10 text-amber-500";
+            default: return "bg-[var(--bg-secondary)] text-[var(--text-secondary)]";
+        }
+    };
+
+    const getTransactionTitle = (tx: Transaction) => {
+        switch (tx.type) {
+            case "DEPOSIT": return "Deposit";
+            case "WITHDRAW": return "Withdraw";
+            case "BUY": return `Bought ${tx.symbol}`;
+            case "SELL": return `Sold ${tx.symbol}`;
+            default: return "Transaction";
+        }
+    };
+
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
@@ -91,73 +159,106 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Total Value */}
-                <div className="p-6 rounded-3xl bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-xl">
-                    <div className="flex items-center gap-2 mb-2 opacity-80">
-                        <Briefcase size={20} />
-                        <span className="text-sm font-medium">Portfolio Value</span>
-                    </div>
-                    <div className="text-4xl font-extrabold mb-4">
-                        {formatCurrency(data.currentValue + data.balance)}
-                    </div>
-                    <div className="flex justify-between items-end">
+            {/* Main Stats Area with Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                {/* Visual Portfolio Card */}
+                <div className="lg:col-span-2 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm">
+                    <div className="flex justify-between items-start mb-6">
                         <div>
-                            <div className="text-xs opacity-70 mb-1">Cash Balance</div>
-                            <div className="text-lg font-bold">{formatCurrency(data.balance)}</div>
+                            <p className="text-[var(--text-secondary)] text-sm font-medium mb-1">Total Net Worth</p>
+                            <h2 className="text-4xl font-extrabold text-[var(--text-primary)]">
+                                {formatCurrency(data.currentValue + data.balance)}
+                            </h2>
                         </div>
-                        <div className="bg-white/20 px-3 py-1 rounded-lg text-sm font-bold backdrop-blur-sm">
-                            {data.totalGainLoss >= 0 ? "+" : ""}{formatCurrency(data.totalGainLoss)}
+                        <div className={`text-right ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                            <p className="text-lg font-bold flex items-center justify-end gap-1">
+                                {data.totalGainLoss >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
+                                {formatCurrency(Math.abs(data.totalGainLoss))}
+                            </p>
+                            <p className="text-xs font-semibold opacity-80">All time return</p>
                         </div>
+                    </div>
+
+                    <div className="h-[250px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={chartData}>
+                                <defs>
+                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <Tooltip
+                                    contentStyle={{
+                                        background: "var(--bg-card)",
+                                        border: "1px solid var(--border-color)",
+                                        borderRadius: 12,
+                                        fontSize: 13,
+                                        color: "var(--text-primary)",
+                                    }}
+                                    formatter={(value: unknown) => [formatCurrency(Number(value)), "Net Worth"]}
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="value"
+                                    stroke="#6366f1"
+                                    strokeWidth={3}
+                                    fill="url(#colorValue)"
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Gain/Loss */}
-                <div className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)]">
-                    <div className="flex items-center gap-2 mb-6 text-[var(--text-secondary)]">
-                        <TrendingUp size={20} />
-                        <span className="text-sm font-medium">Total Returns</span>
+                {/* Side Stats */}
+                <div className="flex flex-col gap-6">
+                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
+                            <Wallet size={20} />
+                            <span className="text-sm font-medium">Buying Power</span>
+                        </div>
+                        <div className="text-3xl font-bold text-[var(--text-primary)]">
+                            {formatCurrency(data.balance)}
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mt-1">Available to trade</p>
                     </div>
-                    <div className={`text-3xl font-bold mb-2 ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                        {data.totalGainLoss >= 0 ? "+" : ""}{formatCurrency(data.totalGainLoss)}
-                    </div>
-                    <div className="text-sm text-[var(--text-secondary)]">
-                        All time profit/loss
-                    </div>
-                </div>
 
-                {/* Invested */}
-                <div className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)]">
-                    <div className="flex items-center gap-2 mb-6 text-[var(--text-secondary)]">
-                        <PieChart size={20} />
-                        <span className="text-sm font-medium">Invested Capital</span>
-                    </div>
-                    <div className="text-3xl font-bold mb-2 text-[var(--text-primary)]">
-                        {formatCurrency(data.totalInvested)}
-                    </div>
-                    <div className="text-sm text-[var(--text-secondary)]">
-                        Cost basis of current holdings
+                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                        <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
+                            <PieChart size={20} />
+                            <span className="text-sm font-medium">Invested Assets</span>
+                        </div>
+                        <div className="text-3xl font-bold text-[var(--text-primary)]">
+                            {formatCurrency(data.currentValue)}
+                        </div>
+                        <p className="text-xs text-[var(--text-secondary)] mt-1">{data.portfolio.length} active positions</p>
                     </div>
                 </div>
             </div>
 
-            {/* Content Grid */}
+            {/* Bottom Section */}
             <div className="grid lg:grid-cols-3 gap-8">
-                {/* Holdings */}
+                {/* Assets List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)]">Your Assets</h2>
+                    <h2 className="text-xl font-bold text-[var(--text-primary)]">Your Portfolio</h2>
                     {data.portfolio.length === 0 ? (
-                        <div className="p-8 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] text-center text-[var(--text-muted)]">
-                            <p className="mb-4">No assets found.</p>
-                            <Link href="/stocks" className="text-indigo-500 hover:underline">Start Investing</Link>
+                        <div className="p-12 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] text-center">
+                            <div className="w-16 h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--text-secondary)]">
+                                <Briefcase size={32} />
+                            </div>
+                            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">No stocks yet</h3>
+                            <p className="text-[var(--text-secondary)] mb-6">Your portfolio is looking a bit empty.</p>
+                            <Link href="/stocks" className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors">
+                                Explore Market
+                            </Link>
                         </div>
                     ) : (
                         <div className="grid gap-4">
                             {data.portfolio.map((item) => (
-                                <Link href={`/stocks/${item.stockId}`} key={item.stockId} className="flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-indigo-500/30 transition-all hover:shadow-md">
+                                <Link href={`/stocks/${item.stockId}`} key={item.stockId} className="group flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-indigo-500/50 transition-all hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center font-bold text-lg text-[var(--text-primary)]">
+                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center font-bold text-lg text-[var(--text-primary)] group-hover:bg-indigo-500 group-hover:text-white transition-colors">
                                             {item.symbol[0]}
                                         </div>
                                         <div>
@@ -177,19 +278,19 @@ export default function DashboardPage() {
                     )}
                 </div>
 
-                {/* Activity */}
+                {/* Activity Feed */}
                 <div className="space-y-6">
                     <h2 className="text-xl font-bold text-[var(--text-primary)]">Recent Activity</h2>
                     <div className="space-y-4">
                         {data.recentActivity.map((tx) => (
                             <div key={tx._id} className="flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)]">
                                 <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-full ${tx.type === 'BUY' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
-                                        {tx.type === 'BUY' ? <ArrowDownLeft size={16} /> : <ArrowUpRight size={16} />}
+                                    <div className={`p-2 rounded-full ${getTransactionColor(tx.type)}`}>
+                                        {getTransactionIcon(tx.type)}
                                     </div>
                                     <div>
                                         <div className="font-bold text-sm text-[var(--text-primary)]">
-                                            {tx.type === 'BUY' ? 'Bought' : 'Sold'} {tx.symbol}
+                                            {getTransactionTitle(tx)}
                                         </div>
                                         <div className="text-xs text-[var(--text-muted)]">
                                             {new Date(tx.date).toLocaleDateString()}
@@ -201,13 +302,15 @@ export default function DashboardPage() {
                                         {formatCurrency(tx.totalAmount)}
                                     </div>
                                     <div className="text-xs text-[var(--text-secondary)]">
-                                        {tx.shares.toFixed(4)} shares
+                                        {tx.shares ? `${tx.shares.toFixed(4)} shares` : "Completed"}
                                     </div>
                                 </div>
                             </div>
                         ))}
                         {data.recentActivity.length === 0 && (
-                            <div className="text-center text-[var(--text-muted)] py-4">No recent activity</div>
+                            <div className="text-center text-[var(--text-muted)] py-8 border border-dashed border-[var(--border-color)] rounded-2xl">
+                                No recent activity
+                            </div>
                         )}
                     </div>
                 </div>

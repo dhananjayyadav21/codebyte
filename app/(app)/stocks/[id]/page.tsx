@@ -23,7 +23,8 @@ import {
     Calculator,
     Info,
     Loader2,
-    Briefcase
+    Briefcase,
+    PieChart
 } from "lucide-react";
 import Link from "next/link";
 
@@ -50,6 +51,8 @@ interface Stock {
     logo: string;
     userBalance?: number;
     userShares?: number;
+    totalShares?: number;
+    availableShares?: number;
 }
 
 export default function StockDetailPage() {
@@ -102,6 +105,12 @@ export default function StockDetailPage() {
     const sharesToTrade = amount ? parseFloat(amount) / stock.price : 0;
     const simReturn1y = amount ? parseFloat(amount) * (stock.growthScore / 100) * 0.3 : 0;
 
+    // Inventory Calc
+    const totalShares = stock.totalShares || 1000000;
+    const availableShares = stock.availableShares !== undefined ? stock.availableShares : totalShares;
+    const soldShares = totalShares - availableShares;
+    const ownershipPercent = (soldShares / totalShares) * 100;
+
     // AI Recommendation Colors
     const getRecStyles = (rec: string) => {
         switch (rec) {
@@ -120,10 +129,18 @@ export default function StockDetailPage() {
         setIsTrading(true);
 
         // Validation
-        if (activeTab === "BUY" && stock.userBalance !== undefined && parseFloat(amount) > stock.userBalance) {
-            showToast("Insufficient funds", "error");
-            setIsTrading(false);
-            return;
+        if (activeTab === "BUY") {
+            if (stock.userBalance !== undefined && parseFloat(amount) > stock.userBalance) {
+                showToast("Insufficient funds", "error");
+                setIsTrading(false);
+                return;
+            }
+            // Check inventory
+            if (sharesToTrade > availableShares) {
+                showToast(`Only ${availableShares.toFixed(2)} shares available!`, "error");
+                setIsTrading(false);
+                return;
+            }
         }
         if (activeTab === "SELL" && stock.userShares !== undefined && sharesToTrade > stock.userShares) {
             showToast("Insufficient shares", "error");
@@ -135,10 +152,6 @@ export default function StockDetailPage() {
             const payload = {
                 stockId: stock._id,
                 type: activeTab,
-                // API supports 'amount' for costs or 'quantity' for shares.
-                // For BUY, we usually specify amount ($). 
-                // For SELL, we usually specify quantity (shares) or amount ($).
-                // Our UI input is amount ($). Let's stick with amount.
                 amount: parseFloat(amount)
             };
 
@@ -155,7 +168,7 @@ export default function StockDetailPage() {
             showToast(`${action} ${data.shares.toFixed(4)} shares of ${stock.symbol} for $${amount}!`, "success");
             setAmount("");
 
-            // Refresh data to update balance/shares
+            // Refresh data to update balance/shares/inventory
             fetchStock();
 
         } catch (error: any) {
@@ -301,6 +314,32 @@ export default function StockDetailPage() {
                 {/* Right Column: Calculator & AI (1/3 width on large) */}
                 <div className="lg:col-span-1 space-y-6">
 
+                    {/* Inventory Status Card */}
+                    <div className="p-5 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm">
+                        <div className="flex items-center gap-2 mb-3 text-[var(--text-secondary)]">
+                            <PieChart size={18} />
+                            <span className="text-sm font-bold uppercase tracking-wider">Market Inventory</span>
+                        </div>
+                        <div className="flex justify-between items-end mb-2">
+                            <div>
+                                <p className="text-2xl font-bold text-[var(--text-primary)]">
+                                    {formatCompact(availableShares)}
+                                </p>
+                                <p className="text-xs text-[var(--text-secondary)]">Available Shares</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm font-bold text-indigo-500">{ownershipPercent.toFixed(1)}%</p>
+                                <p className="text-xs text-[var(--text-secondary)]">Owned by Users</p>
+                            </div>
+                        </div>
+                        <div className="w-full h-2 bg-[var(--bg-secondary)] rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-indigo-500 rounded-full transition-all duration-500"
+                                style={{ width: `${ownershipPercent}%` }}
+                            />
+                        </div>
+                    </div>
+
                     {/* Buy/Sell Calculator */}
                     <div className="p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm sticky top-24">
                         <div className="flex items-center gap-2 mb-6">
@@ -367,8 +406,8 @@ export default function StockDetailPage() {
                                 onClick={handleTrade}
                                 disabled={isTrading}
                                 className={`w-full py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${activeTab === "BUY"
-                                        ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
-                                        : "bg-red-500/10 text-red-500 border border-red-500/20"
+                                    ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                                    : "bg-red-500/10 text-red-500 border border-red-500/20"
                                     }`}
                             >
                                 {isTrading ? <Loader2 className="animate-spin" /> : `${activeTab === "BUY" ? "Buy" : "Sell"} ${stock.symbol}`}

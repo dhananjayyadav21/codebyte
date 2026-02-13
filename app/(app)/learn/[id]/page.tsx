@@ -13,6 +13,17 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
     const [showToast, setShowToast] = useState(false);
     const lesson = lessons.find((l) => l.id === id);
 
+    if (!lesson) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
+                <h2 className="text-2xl font-bold text-[var(--text-primary)]">Lesson Not Found</h2>
+                <Link href="/learn" className="text-[var(--accent)] hover:underline">
+                    Back to Lessons
+                </Link>
+            </div>
+        );
+    }
+
     const handleShare = async () => {
         if (navigator.share) {
             try {
@@ -34,17 +45,6 @@ export default function LessonPage({ params }: { params: Promise<{ id: string }>
             }
         }
     };
-
-    if (!lesson) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-                <h2 className="text-2xl font-bold text-[var(--text-primary)]">Lesson Not Found</h2>
-                <Link href="/learn" className="text-[var(--accent)] hover:underline">
-                    Back to Lessons
-                </Link>
-            </div>
-        );
-    }
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in relative">

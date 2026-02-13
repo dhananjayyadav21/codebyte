@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
     LayoutDashboard,
     TrendingUp,
@@ -9,12 +10,15 @@ import {
     UserCircle,
     LogOut,
     X,
+    Wallet,
+    Shield,
 } from "lucide-react";
 import { Logo } from "./Logo";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { href: "/stocks", label: "Stocks", icon: TrendingUp },
+    { href: "/deposit", label: "Deposit", icon: Wallet },
     { href: "/learn", label: "Learn", icon: BookOpen },
     { href: "/profile", label: "Profile", icon: UserCircle },
 ];
@@ -26,6 +30,18 @@ interface SidebarProps {
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
     const pathname = usePathname();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        fetch("/api/auth/me")
+            .then(res => res.json())
+            .then(data => {
+                if (data.user?.role === "admin") {
+                    setIsAdmin(true);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     return (
         <>
@@ -99,6 +115,42 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                             </Link>
                         );
                     })}
+
+                    {/* Admin Panel Link */}
+                    {isAdmin && (
+                        <>
+                            <div style={{
+                                margin: "12px 16px 4px",
+                                fontSize: 11,
+                                fontWeight: 600,
+                                color: "var(--text-muted)",
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em"
+                            }}>
+                                Admin
+                            </div>
+                            <Link
+                                href="/admin/dashboard"
+                                onClick={onClose}
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 12,
+                                    padding: "12px 16px",
+                                    borderRadius: 12,
+                                    textDecoration: "none",
+                                    fontSize: 14,
+                                    fontWeight: pathname?.startsWith("/admin") ? 600 : 500,
+                                    color: pathname?.startsWith("/admin") ? "#6366f1" : "var(--text-secondary)",
+                                    background: pathname?.startsWith("/admin") ? "#6366f115" : "transparent",
+                                    transition: "all 0.2s ease",
+                                }}
+                            >
+                                <Shield size={20} />
+                                Admin Panel
+                            </Link>
+                        </>
+                    )}
                 </nav>
 
                 {/* Bottom */}

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
+import User from "@/lib/models/User";
 import Portfolio from "@/lib/models/Portfolio";
 import Stock from "@/lib/models/Stock";
 import Transaction from "@/lib/models/Transaction";
@@ -14,51 +15,56 @@ export async function GET(request: Request) {
 
         await connectDB();
 
-        // 1. Fetch Portfolio
+        // 1. Get User Balance (Ensure it's a number)
+        const dbUser = await User.findById(user._id).select("balance");
+        const balance = dbUser?.balance || 0; // Fix NaN issue
+
+        // 2. Get Portfolio Items
         const portfolioItems = await Portfolio.find({ userId: user._id }).lean();
 
-        // 2. Fetch Latest Stock Prices to calculate current value
-        const stockIds = portfolioItems.map(p => p.stockId);
-        const stocks = await Stock.find({ _id: { $in: stockIds } }).lean();
-
-        const stockMap = new Map(stocks.map(s => [s._id.toString(), s]));
-
-        // 3. Calculate Portfolio Value & Stats
         let totalInvested = 0;
         let currentValue = 0;
 
-        const holdings = portfolioItems.map(item => {
-            const stock = stockMap.get(item.stockId.toString());
-            const currentPrice = stock ? stock.price : item.averageBuyPrice; // Fallback
+        const enrichedPortfolio = await Promise.all(portfolioItems.map(async (item) => {
+            const stock = await Stock.findById(item.stockId).select("name price symbol change changePercent").lean();
+            if (!stock) return null;
 
+            const value = item.shares * stock.price;
             const invested = item.shares * item.averageBuyPrice;
-            const current = item.shares * currentPrice;
 
             totalInvested += invested;
-            currentValue += current;
+            currentValue += value;
 
             return {
-                ...item,
-                stockName: stock?.name || "Unknown",
-                currentPrice,
-                currentValue: current,
-                gainLoss: current - invested,
-                gainLossPercent: invested > 0 ? ((current - invested) / invested) * 100 : 0
+                stockId: item.stockId,
+                symbol: stock.symbol,
+                stockName: stock.name,
+                shares: item.shares,
+                averageBuyPrice: item.averageBuyPrice,
+                currentPrice: stock.price,
+                currentValue: value,
+                gainLoss: value - invested,
+                gainLossPercent: invested > 0 ? ((value - invested) / invested) * 100 : 0
             };
-        });
+        }));
 
-        // 4. Fetch Recent Transactions
+        // Filter out nulls (deleted stocks)
+        const validPortfolio = enrichedPortfolio.filter(item => item !== null);
+
+        // 3. Get Recent Activity
         const transactions = await Transaction.find({ userId: user._id })
             .sort({ date: -1 })
             .limit(10)
             .lean();
 
+        const totalGainLoss = currentValue - totalInvested;
+
         return NextResponse.json({
-            balance: user.balance,
+            balance,
             totalInvested,
             currentValue,
-            totalGainLoss: currentValue - totalInvested,
-            portfolio: holdings,
+            totalGainLoss,
+            portfolio: validPortfolio,
             recentActivity: transactions
         });
 

@@ -10,7 +10,6 @@ export function Logo({ className, showTagline = false }: { className?: string; s
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 200 60"
             className={className}
-            className={className}
         >
             <defs>
                 <linearGradient id="logo_grad" x1="0%" y1="0%" x2="100%" y2="0%">

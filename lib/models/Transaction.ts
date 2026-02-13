@@ -15,7 +15,7 @@ export interface ITransaction extends Document {
 const TransactionSchema = new Schema<ITransaction>(
     {
         userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-        stockId: { type: Schema.Types.ObjectId, ref: "Stock", required: false },
+        stockId: { type: Schema.Types.ObjectId, ref: "Stock", required: false }, // Explicitly set false
         symbol: { type: String, required: false },
         type: { type: String, enum: ["BUY", "SELL", "DEPOSIT", "WITHDRAW"], required: true },
         shares: { type: Number, required: false },
@@ -28,5 +28,10 @@ const TransactionSchema = new Schema<ITransaction>(
 );
 
 TransactionSchema.index({ userId: 1, date: -1 });
+
+// Force recompilation of model in dev mode to ensure schema updates are applied
+if (process.env.NODE_ENV === "development" && mongoose.models.Transaction) {
+    delete mongoose.models.Transaction;
+}
 
 export default mongoose.models.Transaction || mongoose.model<ITransaction>("Transaction", TransactionSchema);

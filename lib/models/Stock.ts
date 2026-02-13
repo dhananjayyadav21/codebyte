@@ -20,6 +20,8 @@ export interface IStock extends Document {
     description: string;
     history: { date: string; price: number }[];
     logo: string;
+    totalShares: number; // Admin issued shares
+    availableShares: number; // Remaining shares for users
 }
 
 const StockSchema = new Schema<IStock>(
@@ -43,8 +45,15 @@ const StockSchema = new Schema<IStock>(
         description: { type: String, default: "" },
         history: [{ date: String, price: Number }],
         logo: { type: String, default: "📈" },
+        totalShares: { type: Number, required: true, default: 1000000 },
+        availableShares: { type: Number, required: true, default: 1000000 },
     },
     { timestamps: true }
 );
+
+// Force recompilation in dev
+if (process.env.NODE_ENV === "development" && mongoose.models.Stock) {
+    delete mongoose.models.Stock;
+}
 
 export default mongoose.models.Stock || mongoose.model<IStock>("Stock", StockSchema);

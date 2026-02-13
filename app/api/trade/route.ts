@@ -5,7 +5,6 @@ import Stock from "@/lib/models/Stock";
 import Transaction from "@/lib/models/Transaction";
 import Portfolio from "@/lib/models/Portfolio";
 import { getCurrentUser } from "@/lib/auth";
-import mongoose from "mongoose";
 
 export async function POST(request: Request) {
     try {
@@ -15,23 +14,13 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { stockId, type, amount, quantity } = body;
-        // Logic: 
-        // If type="BUY", input might be 'amount' (cash) or 'quantity' (shares). 
-        //   - Limit by User Balance.
-        // If type="SELL", input usually 'quantity' (shares).
-        //   - Limit by Portfolio Holdings.
+        const { stockId, type, amount } = body;
 
         if (!stockId || !type) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
         await connectDB();
-
-        // Start Session for Transaction
-        // Note: Transactions require MongoDB Replica Set. If creating standalone, this might fail.
-        // For simplicity in hackathon, we'll try-catch or just do sequential updates without transaction if it fails.
-        // We will do robust sequential updates with checks.
 
         const stock = await Stock.findById(stockId);
         if (!stock) {
@@ -42,14 +31,12 @@ export async function POST(request: Request) {
         let sharesToTrade = 0;
         let totalCost = 0;
 
-        if (quantity) {
-            sharesToTrade = Number(quantity);
-            totalCost = sharesToTrade * currentPrice;
-        } else if (amount) {
+        // Calculate shares/cost
+        if (amount) {
             totalCost = Number(amount);
             sharesToTrade = totalCost / currentPrice;
         } else {
-            return NextResponse.json({ error: "Specify amount or quantity" }, { status: 400 });
+            return NextResponse.json({ error: "Specify amount" }, { status: 400 });
         }
 
         if (sharesToTrade <= 0 || totalCost <= 0) {
@@ -58,20 +45,29 @@ export async function POST(request: Request) {
 
         // --- BUY LOGIC ---
         if (type === "BUY") {
-            // 1. Check Balance
+            // 1. Check User Balance
             if (user.balance < totalCost) {
                 return NextResponse.json({ error: "Insufficient funds" }, { status: 400 });
             }
 
-            // 2. Deduct Balance
+            // 2. Check Inventory (Admin Limit)
+            if (stock.availableShares < sharesToTrade) {
+                return NextResponse.json({
+                    error: `Only ${stock.availableShares.toFixed(4)} shares available`
+                }, { status: 400 });
+            }
+
+            // 3. Update User Balance
             user.balance -= totalCost;
             await User.findByIdAndUpdate(user._id, { balance: user.balance });
 
-            // 3. Update Portfolio
+            // 4. Update Stock Inventory
+            stock.availableShares -= sharesToTrade;
+            await stock.save();
+
+            // 5. Update Portfolio
             const portfolio = await Portfolio.findOne({ userId: user._id, stockId: stock._id });
             if (portfolio) {
-                // Update average price
-                // New Avg = ((OldShares * OldAvg) + (NewShares * NewPrice)) / TotalShares
                 const totalShares = portfolio.shares + sharesToTrade;
                 const newAvg = ((portfolio.shares * portfolio.averageBuyPrice) + totalCost) / totalShares;
 
@@ -88,7 +84,7 @@ export async function POST(request: Request) {
                 });
             }
 
-            // 4. Record Transaction
+            // 6. Log Transaction
             await Transaction.create({
                 userId: user._id,
                 stockId: stock._id,
@@ -96,7 +92,8 @@ export async function POST(request: Request) {
                 type: "BUY",
                 shares: sharesToTrade,
                 price: currentPrice,
-                totalAmount: totalCost
+                totalAmount: totalCost,
+                status: "COMPLETED"
             });
 
             return NextResponse.json({ message: "Buy successful", shares: sharesToTrade, price: currentPrice });
@@ -109,22 +106,24 @@ export async function POST(request: Request) {
                 return NextResponse.json({ error: "Insufficient shares" }, { status: 400 });
             }
 
-            // 1. Add Balance
-            // Note: You can sell even if it's less than what you paid. balance increases by current market value.
+            // 1. Update User Balance
             user.balance += totalCost;
             await User.findByIdAndUpdate(user._id, { balance: user.balance });
 
-            // 2. Update Portfolio
-            portfolio.shares -= sharesToTrade;
-            // We don't change average buy price when selling, usually.
+            // 2. Update Stock Inventory (Return shares to pool)
+            stock.availableShares += sharesToTrade;
+            await stock.save();
 
-            if (portfolio.shares <= 0.000001) { // Floating point safety
+            // 3. Update Portfolio
+            portfolio.shares -= sharesToTrade;
+
+            if (portfolio.shares <= 0.000001) {
                 await Portfolio.findByIdAndDelete(portfolio._id);
             } else {
                 await portfolio.save();
             }
 
-            // 3. Record Transaction
+            // 4. Log Transaction
             await Transaction.create({
                 userId: user._id,
                 stockId: stock._id,
@@ -132,7 +131,8 @@ export async function POST(request: Request) {
                 type: "SELL",
                 shares: sharesToTrade,
                 price: currentPrice,
-                totalAmount: totalCost
+                totalAmount: totalCost,
+                status: "COMPLETED"
             });
 
             return NextResponse.json({ message: "Sell successful", shares: sharesToTrade, price: currentPrice });
