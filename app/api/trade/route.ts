@@ -4,6 +4,7 @@ import User from "@/lib/models/User";
 import Stock from "@/lib/models/Stock";
 import Transaction from "@/lib/models/Transaction";
 import Portfolio from "@/lib/models/Portfolio";
+import Notification from "@/lib/models/Notification";
 import { getCurrentUser } from "@/lib/auth";
 
 export async function POST(request: Request) {
@@ -96,6 +97,14 @@ export async function POST(request: Request) {
                 status: "COMPLETED"
             });
 
+            // 7. Send Notification
+            await Notification.create({
+                userId: user._id,
+                type: "trade",
+                title: "Buy Order Executed",
+                message: `You successfully bought ${sharesToTrade.toFixed(4)} shares of ${stock.symbol} for $${totalCost.toFixed(2)}.`
+            });
+
             return NextResponse.json({ message: "Buy successful", shares: sharesToTrade, price: currentPrice });
         }
 
@@ -133,6 +142,14 @@ export async function POST(request: Request) {
                 price: currentPrice,
                 totalAmount: totalCost,
                 status: "COMPLETED"
+            });
+
+            // 5. Send Notification
+            await Notification.create({
+                userId: user._id,
+                type: "trade",
+                title: "Sell Order Executed",
+                message: `You successfully sold ${sharesToTrade.toFixed(4)} shares of ${stock.symbol} for $${totalCost.toFixed(2)}.`
             });
 
             return NextResponse.json({ message: "Sell successful", shares: sharesToTrade, price: currentPrice });

@@ -29,23 +29,26 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 </div>
 
                 <nav className="flex-1 p-4 space-y-1">
-                    <Link href="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 text-indigo-600 font-medium">
+                    <Link href="/admin/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-50 text-indigo-600 font-medium hover:bg-indigo-50 transition-colors">
                         <LayoutDashboard size={20} />
                         Dashboard
                     </Link>
-                    <Link href="/admin/stocks/new" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors">
-                        <PlusCircle size={20} />
-                        Add Stock
-                    </Link>
+
                     <div className="pt-4 pb-2 px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">
                         Management
                     </div>
-                    {/* Placeholder links provided for future expansion */}
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors text-left">
+
+                    <Link href="/admin/stocks" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors">
+                        <Package size={20} />
+                        Stocks & Inventory
+                    </Link>
+
+                    <Link href="/admin/users" className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors">
                         <Users size={20} />
                         Users
-                    </button>
-                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors text-left">
+                    </Link>
+
+                    <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 hover:text-gray-900 font-medium transition-colors text-left opacity-50 cursor-not-allowed">
                         <Settings size={20} />
                         Settings
                     </button>
