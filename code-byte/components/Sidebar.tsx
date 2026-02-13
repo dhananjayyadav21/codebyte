@@ -31,29 +31,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             {/* Overlay for mobile */}
             {open && (
                 <div
-                    className="fixed inset-0 z-40 lg:hidden"
-                    style={{ background: "rgba(0,0,0,0.4)" }}
+                    className="fixed inset-0 z-40 lg:hidden bg-black/40 backdrop-blur-sm"
                     onClick={onClose}
                 />
             )}
 
             <aside
-                style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    width: 260,
-                    background: "var(--bg-sidebar)",
-                    borderRight: "1px solid var(--border-color)",
-                    zIndex: 50,
-                    transition: "transform 0.3s ease",
-                    transform: open ? "translateX(0)" : "translateX(-100%)",
-                    display: "flex",
-                    flexDirection: "column",
-                    padding: "0",
-                }}
-                className="lg:!translate-x-0"
+                className={`fixed inset-y-0 left-0 z-50 w-[260px] flex flex-col bg-[var(--bg-sidebar)] border-r border-[var(--border-color)] transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "-translate-x-full"
+                    } lg:translate-x-0`}
             >
                 {/* Logo */}
                 <div
