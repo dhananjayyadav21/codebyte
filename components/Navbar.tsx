@@ -2,6 +2,8 @@
 
 import { Menu, Sun, Moon, Bell } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import { Logo } from "./Logo";
+import Link from "next/link";
 
 interface NavbarProps {
     onMenuClick: () => void;
@@ -40,6 +42,13 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             >
                 <Menu size={22} />
             </button>
+
+            {/* Mobile Logo */}
+            <div className="lg:hidden" style={{ height: 32 }}>
+                <Link href="/">
+                    <Logo className="h-full" />
+                </Link>
+            </div>
 
             <div className="hidden lg:block" />
 
@@ -104,6 +113,6 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
                     DK
                 </div>
             </div>
-        </header>
+        </header >
     );
 }

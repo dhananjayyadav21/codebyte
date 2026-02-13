@@ -53,7 +53,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 >
                     <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
                         <div style={{ height: 32 }}>
-                            <Logo />
+                            <Logo className="h-full" />
                         </div>
                     </Link>
                     <button
