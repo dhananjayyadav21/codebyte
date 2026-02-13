@@ -144,37 +144,43 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-fade-in">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-6 lg:space-y-8 animate-fade-in">
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-[var(--text-primary)]">Dashboard</h1>
-                    <p className="text-[var(--text-secondary)]">Overview of your investments</p>
+                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[var(--text-primary)]">Dashboard</h1>
+                    <p className="text-sm sm:text-base text-[var(--text-secondary)] mt-1">Overview of your investments</p>
                 </div>
-                <div className="flex gap-3">
-                    <Link href="/deposit" className="px-4 py-2 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold hover:bg-[var(--border-color)] transition-colors">
+                <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                    <Link
+                        href="/deposit"
+                        className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold hover:bg-[var(--border-color)] transition-colors text-center text-sm"
+                    >
                         Deposit
                     </Link>
-                    <Link href="/stocks" className="px-4 py-2 rounded-xl bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold hover:opacity-90 transition-opacity flex items-center gap-2">
+                    <Link
+                        href="/stocks"
+                        className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 text-sm"
+                    >
                         <Plus size={18} /> New Trade
                     </Link>
                 </div>
             </div>
 
             {/* Main Stats Area with Chart */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 lg:gap-6">
 
                 {/* Visual Portfolio Card */}
-                <div className="lg:col-span-2 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm">
-                    <div className="flex justify-between items-start mb-6">
+                <div className="xl:col-span-8 p-5 sm:p-6 lg:p-8 rounded-2xl lg:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] shadow-sm">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                         <div>
-                            <p className="text-[var(--text-secondary)] text-sm font-medium mb-1">Total Net Worth</p>
-                            <h2 className="text-4xl font-extrabold text-[var(--text-primary)]">
+                            <p className="text-[var(--text-secondary)] text-xs sm:text-sm font-medium mb-1">Total Net Worth</p>
+                            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[var(--text-primary)]">
                                 {formatPrice(data.currentValue + data.balance)}
                             </h2>
                         </div>
-                        <div className={`text-right ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                            <p className="text-lg font-bold flex items-center justify-end gap-1">
+                        <div className={`text-left sm:text-right ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                            <p className="text-base sm:text-lg font-bold flex items-center gap-1">
                                 {data.totalGainLoss >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
                                 {formatPrice(Math.abs(data.totalGainLoss))}
                             </p>
@@ -182,7 +188,7 @@ export default function DashboardPage() {
                         </div>
                     </div>
 
-                    <div className="h-[250px] w-full">
+                    <div className="h-[200px] sm:h-[250px] lg:h-[280px] w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={chartData}>
                                 <defs>
@@ -213,36 +219,39 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Side Stats */}
-                <div className="flex flex-col gap-6">
-                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                {/* Side Stats - Responsive Grid */}
+                <div className="xl:col-span-4 grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-1 gap-4 lg:gap-6">
+                    {/* Buying Power */}
+                    <div className="p-5 sm:p-6 rounded-2xl lg:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
-                            <Wallet size={20} />
-                            <span className="text-sm font-medium">Buying Power</span>
+                            <Wallet size={18} className="sm:w-5 sm:h-5" />
+                            <span className="text-xs sm:text-sm font-medium">Buying Power</span>
                         </div>
-                        <div className="text-3xl font-bold text-[var(--text-primary)]">
+                        <div className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
                             {formatPrice(data.balance)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">Available to trade</p>
                     </div>
 
-                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                    {/* Invested Assets */}
+                    <div className="p-5 sm:p-6 rounded-2xl lg:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
-                            <PieChart size={20} />
-                            <span className="text-sm font-medium">Invested Assets</span>
+                            <PieChart size={18} className="sm:w-5 sm:h-5" />
+                            <span className="text-xs sm:text-sm font-medium">Invested Assets</span>
                         </div>
-                        <div className="text-3xl font-bold text-[var(--text-primary)]">
+                        <div className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
                             {formatPrice(data.currentValue)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">{data.portfolio.length} active positions</p>
                     </div>
 
-                    <div className="flex-1 p-6 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
+                    {/* Total Profit/Loss */}
+                    <div className="p-5 sm:p-6 rounded-2xl lg:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] flex flex-col justify-center">
                         <div className="flex items-center gap-2 mb-2 text-[var(--text-secondary)]">
-                            {data.totalGainLoss >= 0 ? <TrendingUp size={20} /> : <TrendingDown size={20} />}
-                            <span className="text-sm font-medium">Total Profit/Loss</span>
+                            {data.totalGainLoss >= 0 ? <TrendingUp size={18} className="sm:w-5 sm:h-5" /> : <TrendingDown size={18} className="sm:w-5 sm:h-5" />}
+                            <span className="text-xs sm:text-sm font-medium">Total Profit/Loss</span>
                         </div>
-                        <div className={`text-3xl font-bold ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                        <div className={`text-2xl sm:text-3xl font-bold ${data.totalGainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                             {data.totalGainLoss >= 0 ? "+" : ""}{formatPrice(data.totalGainLoss)}
                         </div>
                         <p className="text-xs text-[var(--text-secondary)] mt-1">Total investment returns</p>
@@ -251,36 +260,40 @@ export default function DashboardPage() {
             </div>
 
             {/* Bottom Section */}
-            <div className="grid lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                 {/* Assets List */}
-                <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)]">Your Portfolio</h2>
+                <div className="lg:col-span-8 space-y-4 lg:space-y-6">
+                    <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">Your Portfolio</h2>
                     {data.portfolio.length === 0 ? (
-                        <div className="p-12 rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] text-center">
-                            <div className="w-16 h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--text-secondary)]">
-                                <Briefcase size={32} />
+                        <div className="p-8 sm:p-12 rounded-2xl lg:rounded-3xl bg-[var(--bg-card)] border border-[var(--border-color)] text-center">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center mx-auto mb-4 text-[var(--text-secondary)]">
+                                <Briefcase size={28} className="sm:w-8 sm:h-8" />
                             </div>
-                            <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">No stocks yet</h3>
-                            <p className="text-[var(--text-secondary)] mb-6">Your portfolio is looking a bit empty.</p>
-                            <Link href="/stocks" className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors">
+                            <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] mb-2">No stocks yet</h3>
+                            <p className="text-sm text-[var(--text-secondary)] mb-6">Your portfolio is looking a bit empty.</p>
+                            <Link href="/stocks" className="inline-flex items-center justify-center px-6 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors text-sm">
                                 Explore Market
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:gap-4">
                             {data.portfolio.map((item) => (
-                                <Link href={`/stocks/${item.stockId}`} key={item.stockId} className="group flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-indigo-500/50 transition-all hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-1">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center font-bold text-lg text-[var(--text-primary)] group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                <Link
+                                    href={`/stocks/${item.stockId}`}
+                                    key={item.stockId}
+                                    className="group flex items-center justify-between p-4 sm:p-5 rounded-xl lg:rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-indigo-500/50 transition-all hover:shadow-lg hover:shadow-indigo-500/5 hover:-translate-y-0.5"
+                                >
+                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[var(--bg-secondary)] flex items-center justify-center font-bold text-base sm:text-lg text-[var(--text-primary)] group-hover:bg-indigo-500 group-hover:text-white transition-colors flex-shrink-0">
                                             {item.symbol[0]}
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-[var(--text-primary)]">{item.symbol}</h3>
-                                            <p className="text-xs text-[var(--text-secondary)]">{item.shares.toFixed(4)} shares</p>
+                                        <div className="min-w-0">
+                                            <h3 className="font-bold text-sm sm:text-base text-[var(--text-primary)] truncate">{item.symbol}</h3>
+                                            <p className="text-xs text-[var(--text-secondary)] truncate">{item.shares.toFixed(4)} shares</p>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <div className="font-bold text-[var(--text-primary)]">{formatPrice(item.currentValue)}</div>
+                                    <div className="text-right flex-shrink-0 ml-2">
+                                        <div className="font-bold text-sm sm:text-base text-[var(--text-primary)]">{formatPrice(item.currentValue)}</div>
                                         <div className={`text-xs font-semibold ${item.gainLoss >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                                             {item.gainLoss >= 0 ? "+" : ""}{formatPrice(item.gainLoss)} ({item.gainLossPercent.toFixed(2)}%)
                                         </div>
@@ -292,36 +305,36 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Activity Feed */}
-                <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-[var(--text-primary)]">Recent Activity</h2>
-                    <div className="space-y-4">
+                <div className="lg:col-span-4 space-y-4 lg:space-y-6">
+                    <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">Recent Activity</h2>
+                    <div className="space-y-3 lg:space-y-4">
                         {data.recentActivity.map((tx) => (
-                            <div key={tx._id} className="flex items-center justify-between p-4 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)]">
-                                <div className="flex items-center gap-3">
-                                    <div className={`p-2 rounded-full ${getTransactionColor(tx.type)}`}>
+                            <div key={tx._id} className="flex items-center justify-between p-3.5 sm:p-4 rounded-xl lg:rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)]">
+                                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                                    <div className={`p-2 rounded-full flex-shrink-0 ${getTransactionColor(tx.type)}`}>
                                         {getTransactionIcon(tx.type)}
                                     </div>
-                                    <div>
-                                        <div className="font-bold text-sm text-[var(--text-primary)]">
+                                    <div className="min-w-0">
+                                        <div className="font-bold text-xs sm:text-sm text-[var(--text-primary)] truncate">
                                             {getTransactionTitle(tx)}
                                         </div>
                                         <div className="text-xs text-[var(--text-muted)]">
-                                            {new Date(tx.date).toLocaleDateString()}
+                                            {new Date(tx.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="font-bold text-sm text-[var(--text-primary)]">
+                                <div className="text-right flex-shrink-0 ml-2">
+                                    <div className="font-bold text-xs sm:text-sm text-[var(--text-primary)]">
                                         {formatPrice(tx.totalAmount)}
                                     </div>
-                                    <div className="text-xs text-[var(--text-secondary)]">
-                                        {tx.shares ? `${tx.shares.toFixed(4)} shares` : "Completed"}
+                                    <div className="text-xs text-[var(--text-secondary)] truncate">
+                                        {tx.shares ? `${tx.shares.toFixed(2)} sh` : "Done"}
                                     </div>
                                 </div>
                             </div>
                         ))}
                         {data.recentActivity.length === 0 && (
-                            <div className="text-center text-[var(--text-muted)] py-8 border border-dashed border-[var(--border-color)] rounded-2xl">
+                            <div className="text-center text-sm text-[var(--text-muted)] py-8 border border-dashed border-[var(--border-color)] rounded-xl lg:rounded-2xl">
                                 No recent activity
                             </div>
                         )}
