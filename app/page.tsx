@@ -298,6 +298,89 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Stock Progress Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-3">Top Performing Stocks</h2>
+            <p className="text-[var(--text-secondary)] text-base max-w-xl mx-auto">
+              Track the performance of trending stocks and build a diversified portfolio.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { symbol: "AAPL", name: "Apple Inc.", price: "$180.50", change: "+12.4%", progress: 75, color: "from-blue-500 to-blue-600" },
+              { symbol: "TSLA", name: "Tesla Inc.", price: "$245.30", change: "+28.9%", progress: 85, color: "from-red-500 to-orange-600" },
+              { symbol: "GOOGL", name: "Alphabet Inc.", price: "$140.20", change: "+8.2%", progress: 65, color: "from-yellow-500 to-red-600" },
+              { symbol: "MSFT", name: "Microsoft Corp.", price: "$380.10", change: "+15.6%", progress: 78, color: "from-cyan-500 to-blue-600" },
+              { symbol: "AMZN", name: "Amazon.com Inc.", price: "$165.80", change: "+18.3%", progress: 82, color: "from-orange-400 to-red-600" },
+              { symbol: "NVDA", name: "NVIDIA Corp.", price: "$875.40", change: "+42.1%", progress: 92, color: "from-green-500 to-emerald-600" },
+            ].map((stock, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/5 transition-all group cursor-pointer"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <div className="text-lg font-bold text-[var(--text-primary)]">{stock.symbol}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-1">{stock.name}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-semibold text-[var(--text-primary)]">{stock.price}</div>
+                    <div className="text-xs text-emerald-500 font-semibold mt-0.5">{stock.change}</div>
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-[var(--text-muted)]">Progress</span>
+                    <span className="text-xs font-bold text-[var(--text-primary)]">{stock.progress}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-[var(--border-color)] rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r ${stock.color} transition-all duration-500`}
+                      style={{ width: `${stock.progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Mini Chart Visualization */}
+                <div className="mt-4 flex items-end justify-between gap-1 h-12">
+                  {[60, 65, 70, 68, 75, 72, stock.progress].map((value, idx) => (
+                    <div
+                      key={idx}
+                      className={`flex-1 rounded-t-sm opacity-70 hover:opacity-100 transition-opacity bg-gradient-to-t ${stock.color}`}
+                      style={{
+                        height: `${(value / 100) * 100}%`,
+                        minHeight: "4px",
+                      }}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-[var(--border-color)]">
+                  <div className="text-xs text-[var(--text-muted)] flex items-center justify-between">
+                    <span>View Details</span>
+                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/stocks"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-indigo-500 text-white font-bold text-base hover:bg-indigo-600 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-indigo-500/25"
+            >
+              Explore All Stocks <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* How it Works */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
