@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Logo } from "@/components/Logo";
 import { Mail, Lock, User, ArrowRight, Sparkles, Eye, EyeOff } from "lucide-react";
 
 export default function SignupPage() {
@@ -31,25 +32,14 @@ export default function SignupPage() {
                 }}
             >
                 <div style={{ textAlign: "center", marginBottom: 32 }}>
-                    <div
-                        style={{
-                            width: 48,
-                            height: 48,
-                            borderRadius: 14,
-                            background: "var(--gradient-card)",
-                            display: "inline-flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginBottom: 16,
-                        }}
-                    >
-                        <Sparkles size={24} color="white" />
+                    <div style={{ height: 60, display: "flex", justifyContent: "center" }}>
+                        <Logo className="h-full" showTagline />
                     </div>
                     <h1 style={{ fontSize: 24, fontWeight: 800, color: "var(--text-primary)", marginBottom: 4 }}>
                         Create Account
                     </h1>
                     <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
-                        Start your investment journey today
+                        Start your StakeWise journey today
                     </p>
                 </div>
 

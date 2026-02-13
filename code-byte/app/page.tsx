@@ -1,5 +1,6 @@
 "use client";
 
+import { Logo } from "@/components/Logo";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -67,22 +68,7 @@ export default function LandingPage() {
         }}
       >
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <div
-            style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: "var(--gradient-card)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Sparkles size={20} color="white" />
-          </div>
-          <span style={{ fontSize: 20, fontWeight: 700, color: "var(--text-primary)" }}>
-            Code<span style={{ color: "var(--accent)" }}>Byte</span>
-          </span>
+          <Logo className="h-8" />
         </Link>
 
         {/* Desktop nav */}
@@ -236,7 +222,7 @@ export default function LandingPage() {
       <section style={{ padding: "80px clamp(16px, 4vw, 48px)", maxWidth: 1200, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 48 }}>
           <h2 style={{ fontSize: "clamp(24px, 3vw, 36px)", fontWeight: 800, color: "var(--text-primary)", marginBottom: 12 }}>
-            Why Code<span style={{ color: "var(--accent)" }}>Byte</span>?
+            Why StakeWise?
           </h2>
           <p style={{ color: "var(--text-secondary)", fontSize: 16, maxWidth: 500, margin: "0 auto" }}>
             Everything you need to start your investment journey, all in one beautifully simple platform.
@@ -320,7 +306,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer style={{ borderTop: "1px solid var(--border-color)", padding: "32px clamp(16px, 4vw, 48px)", textAlign: "center" }}>
         <p style={{ color: "var(--text-muted)", fontSize: 13 }}>
-          © 2026 CodeByte. Built for hackathons with ❤️
+          © 2026 StakeWise. Built for hackathons with ❤️
         </p>
       </footer>
     </div>

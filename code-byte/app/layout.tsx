@@ -4,9 +4,9 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ToastProvider } from "@/components/ToastProvider";
 
 export const metadata: Metadata = {
-  title: "CodeByte — Fractional Investing Made Simple",
+  title: "StakeWise — Own Smarter, Grow Together",
   description:
-    "Invest smart, start small. A modern fractional investing platform with AI-powered suggestions and beginner-friendly tools.",
+    "Own Smarter, Grow Together. A modern fractional investing platform with AI-powered suggestions and beginner-friendly tools.",
 };
 
 export default function RootLayout({

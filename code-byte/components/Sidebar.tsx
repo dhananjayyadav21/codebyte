@@ -10,6 +10,7 @@ import {
     X,
     Sparkles,
 } from "lucide-react";
+import { Logo } from "./Logo";
 
 const navItems = [
     { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -65,28 +66,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                     }}
                 >
                     <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-                        <div
-                            style={{
-                                width: 36,
-                                height: 36,
-                                borderRadius: 10,
-                                background: "var(--gradient-card)",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                            }}
-                        >
-                            <Sparkles size={20} color="white" />
+                        <div style={{ height: 32 }}>
+                            <Logo />
                         </div>
-                        <span
-                            style={{
-                                fontSize: 20,
-                                fontWeight: 700,
-                                color: "var(--text-primary)",
-                            }}
-                        >
-                            Code<span style={{ color: "var(--accent)" }}>Byte</span>
-                        </span>
                     </Link>
                     <button
                         onClick={onClose}
